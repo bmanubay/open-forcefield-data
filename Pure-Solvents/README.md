@@ -13,7 +13,7 @@ Counts of data points per unique journal article separated by property of intere
 
 Naming scheme: purename_counts_Property_(options).csv or .pkl
 
-Where: Property is cpmol (molar isobaric heat capacity), dens, dielec, hmol (molar enthalpy) and sos (speed of sound). (options) is nothing or  'BDC' for denoting sets narrowed down to interesting molecules as decided by Bryce, David and Chris.
+Where: Property is cpmol (molar isobaric heat capacity), dens, dielec, hmol (molar enthalpy of fusion) and sos (speed of sound). (options) is nothing or  'BDC' for denoting sets narrowed down to interesting molecules as decided by Bryce, David and Chris.
 
 # Property data
 Full filtered data for all properties of interest

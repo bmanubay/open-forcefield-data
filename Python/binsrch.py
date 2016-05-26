@@ -5,6 +5,7 @@ Created on Fri Apr  8 13:33:13 2016
 @author: bmanubay
 """
 
+import os
 import thermopyl as th 
 from thermopyl import thermoml_lib
 import cirpy
@@ -44,13 +45,13 @@ df["n_components"] = df.components.apply(lambda x: len(x.split("__")))
 df = df[df.n_components == 2]
 df.dropna(axis=1, how='all', inplace=True)
 
-counts_data = {}
-counts_data["0.  Two Components"] = df.count()[experiments]
-
 # Split components into separate columns (to use name_to_formula)
 df["x1"], df["x2"] =  zip(*df["components"].str.split('__').tolist())
 df['x2'].replace('', np.nan, inplace=True)
 df.dropna(subset=['x2'], inplace=True)
+
+# Strip rows not in liquid phase
+df = df[df['phase']=='Liquid']
 
 df["formula1"] = df.x1.apply(lambda chemical: name_to_formula[chemical])
 df["formula2"] = df.x2.apply(lambda chemical: name_to_formula[chemical])
@@ -70,15 +71,11 @@ df["n_other_atoms2"] = df.n_atoms2 - df.n_desired_atoms2
 df = df[df.n_other_atoms1 == 0]
 df = df[df.n_other_atoms2 == 0]
 
-counts_data["1.  Druglike Elements"] = df.count()[experiments]
-
 df = df[df.n_heavy_atoms1 > 0]
-df = df[df.n_heavy_atoms1 <= 10]
+df = df[df.n_heavy_atoms1 <= 40]
 df = df[df.n_heavy_atoms2 > 0]
-df = df[df.n_heavy_atoms2 <= 10]
+df = df[df.n_heavy_atoms2 <= 40]
 df.dropna(axis=1, how='all', inplace=True)
-
-counts_data["2.  Heavy Atoms"] = df.count()[experiments]
 
 df["SMILES1"] = df.x1.apply(lambda x: resolve_cached(x, "smiles"))  # This should be cached via sklearn.
 df = df[df.SMILES1 != None]
@@ -126,23 +123,14 @@ df["x2"] = df.cas2.apply(lambda x: cannonical_components_lookup2[x])
 df = df[df['Temperature, K'] > 250.]
 df = df[df['Temperature, K'] < 400.]
 
-counts_data["3.  Temperature"] = df.count()[experiments]
-
 # Extract rows with pressure between 101.325 kPa and 101325 kPa
 df = df[df['Pressure, kPa'] > 100.]
 df = df[df['Pressure, kPa'] < 102000.]
 
-counts_data["4.  Pressure"] = df.count()[experiments]
-
-# Strip rows not in liquid phase
-df = df[df['phase']=='Liquid']
-
-counts_data["5.  Liquid state"] = df.count()[experiments]
-
-
 df.dropna(axis=1, how='all', inplace=True)
 
-df["filename"] = df["filename"].map(lambda x: x.lstrip('/home/bmanubay/.thermoml/').rstrip('.xml'))
+df["filename"] = df["filename"].map(lambda x: x.lstrip('/home/bmanubay/.thermoml/'))
+df["filename"] = df.filename.map(lambda x: x.replace(' ', '')[:-4])
 
 def dfpretty(df, prop):
     dfbig = pd.concat([df['filename'], df["x1"], df['x2'], df["SMILES1"], df["SMILES2"], df["cas1"], df["cas2"], df["InChI1"], df["InChI2"], df["components"], df["Mole fraction"],df["Temperature, K"], df["Pressure, kPa"], df[prop], df[prop+"_std"]], axis=1, keys=["filename", "x1", "x2", "SMILES1", "SMILES2", "cas1", "cas2", "InChI1", "InChI2", "components", "Mole fraction", "Temperature, K", "Pressure, kPa", prop, prop+"_std"])

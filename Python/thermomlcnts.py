@@ -94,7 +94,7 @@ ccc7 = pd.concat([count7c["SMILES"], count7c["Count"]], axis=1, keys=["SMILES", 
 c1 = pd.read_csv("/home/bmanubay/.thermoml/tables/Ken/Pure/Component counts/purecomp_counts_cpmol.csv", sep=';', usecols=['SMILES', 'Count'])
 c2 = pd.read_csv("/home/bmanubay/.thermoml/tables/Ken/Pure/Component counts/purecomp_counts_dens.csv", sep=';', usecols=['SMILES', 'Count'])
 c3 = pd.read_csv("/home/bmanubay/.thermoml/tables/Ken/Pure/Component counts/purecomp_counts_dielec.csv", sep=';', usecols=['SMILES', 'Count'])
-c4 = pd.read_csv("/home/bmanubay/.thermoml/tables/Ken/Pure/Component counts/purecomp_counts_hmol.csv", sep=';', usecols=['SMILES', 'Count'])
+c4 = pd.read_csv("/home/bmanubay/.thermoml/tables/Ken/Pure/Component counts/purecomp_counts_hvap.csv", sep=';', usecols=['SMILES', 'Count'])
 c5 = pd.read_csv("/home/bmanubay/.thermoml/tables/Ken/Pure/Component counts/purecomp_counts_sos.csv", sep=';', usecols=['SMILES', 'Count'])
 
 cc1 = pd.read_csv("/home/bmanubay/.thermoml/tables/Ken/Binary/Component counts/bincomp_counts_actcoeff.csv", sep=';', usecols=['SMILES', 'Count'])
@@ -113,9 +113,9 @@ gg5 = pd.read_csv("/home/bmanubay/.thermoml/tables/Ken/Binary/Mixture counts/mix
 gg6 = pd.read_csv("/home/bmanubay/.thermoml/tables/Ken/Binary/Mixture counts/mix_counts_emv.csv", sep=';', index_col= 'Unnamed: 0')
 gg7 = pd.read_csv("/home/bmanubay/.thermoml/tables/Ken/Binary/Mixture counts/mix_counts_sos.csv", sep=';', index_col= 'Unnamed: 0')
 
-a = c2.merge(c1,how='outer',on=['SMILES'],suffixes=(' dens pure', ' cpmol pure')).merge(c5,how='outer',on=['SMILES'],suffixes=(' cpmol pure', ' sos pure')).merge(c3,how='outer',on=['SMILES'],suffixes=(' sos pure', ' dielec pure')).merge(c4,how='outer',on=['SMILES'],suffixes=(' dielec pure', ' hmol pure'))
+a = c2.merge(c1,how='outer',on=['SMILES'],suffixes=(' dens pure', ' cpmol pure')).merge(c5,how='outer',on=['SMILES'],suffixes=(' cpmol pure', ' sos pure')).merge(c3,how='outer',on=['SMILES'],suffixes=(' sos pure', ' dielec pure')).merge(c4,how='outer',on=['SMILES'],suffixes=(' dielec pure', ' hvap pure'))
 a.replace(np.nan,0,inplace=True)
-a.rename(columns={'Count':'Count hmol pure'},inplace=True)
+a.rename(columns={'Count':'Count hvap pure'},inplace=True)
 
 b = cc2.merge(cc1,how='outer',on=['SMILES'],suffixes=(' dens binary', ' actcoeff binary')).merge(cc7,how='outer',on=['SMILES'],suffixes=(' actcoeff binary', ' sos binary')).merge(cc3,how='outer',on=['SMILES'],suffixes=(' sos binary', ' dielec binary')).merge(cc4,how='outer',on=['SMILES'],suffixes=(' dielec binary', ' eme binary')).merge(cc5,how='outer',on=['SMILES'],suffixes=(' eme binary', ' emcp binary')).merge(cc6,how='outer',on=['SMILES'],suffixes=(' emcp binary', ' emv binary'))
 b.replace(np.nan,0,inplace=True)

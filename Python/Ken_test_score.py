@@ -14,7 +14,7 @@ pathdfp = "/home/bmanubay/.thermoml/tables/Ken/Pure/Property data/"
 pathdfm = "/home/bmanubay/.thermoml/tables/Ken/Binary/Property data/"
 
 a1 = pd.read_csv(pathdfp+"dens_pure.csv", sep=';')   
-a2 = pd.read_csv(pathdfp+"hmol_pure.csv", sep=';')
+a2 = pd.read_csv(pathdfp+"hvap_pure.csv", sep=';')
 a3 = pd.read_csv(pathdfp+"cpmol_pure.csv", sep=';')
 
 b1 = pd.read_csv(pathdfm+"dens_bin.csv", sep=';')
@@ -40,7 +40,7 @@ e1 = e1.reset_index()
 e1.columns = ['filename', 'Bin_Dens_Mixtures']
 d2 = c2.groupby('filename').SMILES.unique()
 d2 = d2.reset_index()
-d2.columns = ['filename', 'Pure_Hmol_Molecules']
+d2.columns = ['filename', 'Pure_Hvap_Molecules']
 e2 = c2.groupby('filename').SMILES_mix.unique()
 e2 = e2.reset_index()
 e2.columns = ['filename', 'Bin_EME_Mixtures']
@@ -65,7 +65,7 @@ g2 = g2.astype('str')
 # Format strings in columns
 g2['Pure_Dens_Molecules'] = g2['Pure_Dens_Molecules'].map(lambda x: x.lstrip('"[').rstrip(']"'))
 g2['Bin_Dens_Mixtures'] = g2['Bin_Dens_Mixtures'].map(lambda x: x.lstrip('"[').rstrip(']"'))
-g2['Pure_Hmol_Molecules'] = g2['Pure_Hmol_Molecules'].map(lambda x: x.lstrip('"[').rstrip(']"'))
+g2['Pure_Hvap_Molecules'] = g2['Pure_Hvap_Molecules'].map(lambda x: x.lstrip('"[').rstrip(']"'))
 g2['Bin_EME_Mixtures'] = g2['Bin_EME_Mixtures'].map(lambda x: x.lstrip('"[').rstrip(']"'))
 g2['Pure_Cpmol_Molecules'] = g2['Pure_Cpmol_Molecules'].map(lambda x: x.lstrip('"[').rstrip(']"'))
 g2['Bin_EMCp_Mixtures'] = g2['Bin_EMCp_Mixtures'].map(lambda x: x.lstrip('"[').rstrip(']"'))
@@ -74,7 +74,7 @@ g2['Bin_EMCp_Mixtures'] = g2['Bin_EMCp_Mixtures'].map(lambda x: x.lstrip('"[').r
 g2.replace('nan', np.nan, inplace=True)
 g2.replace('[nan]', np.nan, inplace=True)
 
-cols = ['Pure_Dens_Molecules','Bin_Dens_Mixtures','Pure_Hmol_Molecules','Bin_EME_Mixtures','Pure_Cpmol_Molecules','Bin_EMCp_Mixtures']
+cols = ['Pure_Dens_Molecules','Bin_Dens_Mixtures','Pure_Hvap_Molecules','Bin_EME_Mixtures','Pure_Cpmol_Molecules','Bin_EMCp_Mixtures']
 
 # Return boolean data frame to count how many properties are measured per journal
 g3 = pd.isnull(g2)
@@ -94,8 +94,8 @@ g2['Pure_Dens_Molecules'] = g2['Pure_Dens_Molecules'].str.split()
 g2['Pure_Dens_Counts'] = g2['Pure_Dens_Molecules'].map(lambda x: len(x))
 g2['Bin_Dens_Mixtures'] = g2['Bin_Dens_Mixtures'].str.split()
 g2['Bin_Dens_Counts'] = g2['Bin_Dens_Mixtures'].map(lambda x: len(x))
-g2['Pure_Hmol_Molecules'] = g2['Pure_Hmol_Molecules'].str.split()
-g2['Pure_Hmol_Counts'] = g2['Pure_Hmol_Molecules'].map(lambda x: len(x))
+g2['Pure_Hvap_Molecules'] = g2['Pure_Hvap_Molecules'].str.split()
+g2['Pure_Hvap_Counts'] = g2['Pure_Hvap_Molecules'].map(lambda x: len(x))
 g2['Bin_EME_Mixtures'] = g2['Bin_EME_Mixtures'].str.split()
 g2['Bin_EME_Counts'] = g2['Bin_EME_Mixtures'].map(lambda x: len(x))
 g2['Pure_Cpmol_Molecules'] = g2['Pure_Cpmol_Molecules'].str.split()
@@ -104,7 +104,7 @@ g2['Bin_EMCp_Mixtures'] = g2['Bin_EMCp_Mixtures'].str.split()
 g2['Bin_EMCp_Counts'] = g2['Bin_EMCp_Mixtures'].map(lambda x: len(x))
 
 
-cols = ['Pure_Dens_Counts','Bin_Dens_Counts','Pure_Hmol_Counts','Bin_EME_Counts','Pure_Cpmol_Counts','Bin_EMCp_Counts', 'nan_Count']
+cols = ['Pure_Dens_Counts','Bin_Dens_Counts','Pure_Hvap_Counts','Bin_EME_Counts','Pure_Cpmol_Counts','Bin_EMCp_Counts', 'nan_Count']
 
 # Create column which is count of number of components/mixtures per journal
 g2['Component_Score'] = g2[cols].sum(axis=1)

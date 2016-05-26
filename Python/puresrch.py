@@ -4,7 +4,6 @@ Created on Wed May 18 11:35:57 2016
 
 @author: bmanubay
 """
-
 import thermopyl as th 
 from thermopyl import thermoml_lib
 import cirpy
@@ -29,21 +28,26 @@ dt = list(df.columns)
 bad_filenames = ["/home/bmanubay/.thermoml/j.fluid.2013.12.014.xml"]  # This file confirmed to have possible data entry errors.
 df = df[~df.filename.isin(bad_filenames)]
 
-experiments = ["Mass density, kg/m3","Speed of sound, m/s", "Relative permittivity at zero frequency", "Molar heat capacity at constant pressure, J/K/mol", "Molar enthalpy, kJ/mol"]
+experiments = ["Mass density, kg/m3","Speed of sound, m/s", "Relative permittivity at zero frequency", "Molar heat capacity at constant pressure, J/K/mol", "Molar enthalpy of vaporization or sublimation, kJ/mol", "Molar enthalpy, kJ/mol"]
 
 ind_list = [df[exp].dropna().index for exp in experiments]
 ind = reduce(lambda x,y: x.union(y), ind_list)
 df = df.ix[ind]
 
 name_to_formula = pd.read_hdf("/home/bmanubay/.thermoml/compound_name_to_formula.h5", 'data')
-name_to_formula = name_to_formula.dropna()
+name_to_formula = name_to_formula.dropna()   
+
 
 # Extract rows with two components
 df["n_components"] = df.components.apply(lambda x: len(x.split("__")))
 df = df[df.n_components == 1]
 df.dropna(axis=1, how='all', inplace=True)
 
+# Strip rows not in liquid phase
+df = df[df['phase']=='Liquid']
 
+df = df[df.components.isin(name_to_formula.index)]
+name_to_formula = name_to_formula[name_to_formula.index.isin(df.components)]
 df["formula"] = df.components.apply(lambda chemical: name_to_formula[chemical])
 
 heavy_atoms = ["C", "O"]
@@ -57,7 +61,7 @@ df["n_other_atoms"] = df.n_atoms - df.n_desired_atoms
 df = df[df.n_other_atoms == 0]
 
 df = df[df.n_heavy_atoms > 0]
-df = df[df.n_heavy_atoms <= 10]
+df = df[df.n_heavy_atoms <= 40]
 df.dropna(axis=1, how='all', inplace=True)
 
 df["SMILES"] = df.components.apply(lambda x: resolve_cached(x, "smiles"))  # This should be cached via sklearn.
@@ -87,16 +91,23 @@ df["components"] = df.cas.apply(lambda x: cannonical_components_lookup[x])
 df = df[df['Temperature, K'] > 250.]
 df = df[df['Temperature, K'] < 400.]
 
+cols = ['filename', 'components', 'SMILES', 'cas', 'InChI', 'Temperature, K', 'Pressure, kPa', 'Molar enthalpy of vaporization or sublimation, kJ/mol', 'Molar enthalpy of vaporization or sublimation, kJ/mol_std']
+
+dfhvap = df[cols]
+dfhvap['Molar enthalpy of vaporization or sublimation, kJ/mol'].replace('nan', np.nan, inplace=True)
+dfhvap = dfhvap[np.isnan(dfhvap['Molar enthalpy of vaporization or sublimation, kJ/mol'])==False]
+
 # Extract rows with pressure between 101.325 kPa and 101325 kPa
 df = df[df['Pressure, kPa'] > 100.]
 df = df[df['Pressure, kPa'] < 102000.]
 
-# Strip rows not in liquid phase
-df = df[df['phase']=='Liquid']
-
 df.dropna(axis=1, how='all', inplace=True)
 
-df["filename"] = df["filename"].map(lambda x: x.lstrip('/home/bmanubay/.thermoml/').rstrip('.xml'))
+df["filename"] = df["filename"].map(lambda x: x.lstrip('/home/bmanubay/.thermoml/'))
+df["filename"] = df.filename.map(lambda x: x.replace(' ', '')[:-4])
+
+dfhvap["filename"] = dfhvap["filename"].map(lambda x: x.lstrip('/home/bmanubay/.thermoml/'))
+dfhvap["filename"] = dfhvap.filename.map(lambda x: x.replace(' ', '')[:-4])
 
 def dfpretty(df, prop):
     dfbig = pd.concat([df['filename'], df["components"], df["SMILES"], df["cas"], df["InChI"], df["Temperature, K"], df["Pressure, kPa"], df[prop], df[prop+"_std"]], axis=1, keys=["filename", "components", "SMILES", "CAS", "InChI", "Temperature, K", "Pressure, kPa", prop, prop+"_std"])
@@ -118,7 +129,7 @@ def dfpretty(df, prop):
     return dfbig, a, b
     
                    
-dfbig = pd.concat([df['filename'], df["components"], df["SMILES"], df["cas"], df["InChI"], df["Temperature, K"], df["Pressure, kPa"], df["Mass density, kg/m3"], df["Mass density, kg/m3_std"], df["Speed of sound, m/s"], df["Speed of sound, m/s_std"], df["Relative permittivity at zero frequency"], df["Relative permittivity at zero frequency_std"], df["Molar heat capacity at constant pressure, J/K/mol"], df["Molar heat capacity at constant pressure, J/K/mol_std"], df["Molar enthalpy, kJ/mol"], df["Molar enthalpy, kJ/mol"]] , axis=1, keys=["filename", "components", "SMILES", "CAS", "InChI", "Temperature, K", "Pressure, kPa", "Mass density, kg/m3", "Mass density, kg/m3_std", "Speed of sound, m/s", "Speed of sound, m/s_std", "Relative permittivity at zero frequency", "Relative permittivity at zero frequency_std", "Molar heat capacity at constant pressure, J/K/mol", "Molar heat capacity at constant pressure, J/K/mol_std", "Molar enthalpy, kJ/mol", "Molar enthalpy, kJ/mol"])
+dfbig = pd.concat([df['filename'], df["components"], df["SMILES"], df["cas"], df["InChI"], df["Temperature, K"], df["Pressure, kPa"], df["Mass density, kg/m3"], df["Mass density, kg/m3_std"], df["Speed of sound, m/s"], df["Speed of sound, m/s_std"], df["Relative permittivity at zero frequency"], df["Relative permittivity at zero frequency_std"], df["Molar heat capacity at constant pressure, J/K/mol"], df["Molar heat capacity at constant pressure, J/K/mol_std"], df["Molar enthalpy, kJ/mol"], df["Molar enthalpy, kJ/mol_std"]] , axis=1, keys=["filename", "components", "SMILES", "CAS", "InChI", "Temperature, K", "Pressure, kPa", "Mass density, kg/m3", "Mass density, kg/m3_std", "Speed of sound, m/s", "Speed of sound, m/s_std", "Relative permittivity at zero frequency", "Relative permittivity at zero frequency_std", "Molar heat capacity at constant pressure, J/K/mol", "Molar heat capacity at constant pressure, J/K/mol_std", "Molar enthalpy, kJ/mol", "Molar enthalpy, kJ/mol_std"])
 a = dfbig["filename"].value_counts()
 a = a.reset_index()
 a.rename(columns={"index":"Filename","filename":"Count"},inplace=True)
@@ -128,11 +139,23 @@ b.rename(columns={"index":"InChI","InChI":"Count"},inplace=True)
 b["Component"] = b.InChI.apply(lambda x: resolve_cached(x, "iupac_name"))     
 b["SMILES"] = b.InChI.apply(lambda x: resolve_cached(x, "smiles"))
 
+df6 = dfhvap
+a6 = df6["filename"].value_counts()
+a6 = a6.reset_index()
+a6.rename(columns={"index":"Filename","filename":"Count"},inplace=True)
+b6 = df6["InChI"].value_counts()    
+b6 = b6.reset_index()    
+b6.rename(columns={"index":"InChI","InChI":"Count"},inplace=True)    
+b6["Component"] = b6.InChI.apply(lambda x: resolve_cached(x, "iupac_name"))     
+b6["SMILES"] = b6.InChI.apply(lambda x: resolve_cached(x, "smiles"))
+
+
 df1, a1, b1 = dfpretty(df, "Mass density, kg/m3")
 df2, a2, b2 = dfpretty(df, "Speed of sound, m/s")
 df3, a3, b3 = dfpretty(df, "Relative permittivity at zero frequency")
 df4, a4, b4 = dfpretty(df, "Molar heat capacity at constant pressure, J/K/mol")
 df5, a5, b5 = dfpretty(df, "Molar enthalpy, kJ/mol")
+
 
 
 pathdf = "/home/bmanubay/.thermoml/tables/Ken/Pure/Property data/"
@@ -152,6 +175,7 @@ saveprettycsv(df2, pathdf, "sos_pure.csv")
 saveprettycsv(df3, pathdf, "dielec_pure.csv") 
 saveprettycsv(df4, pathdf, "cpmol_pure.csv") 
 saveprettycsv(df5, pathdf, "hmol_pure.csv") 
+saveprettycsv(df6, pathdf, "hvap_pure.csv")
 
 saveprettycsv(a, pathjourn, "purename_counts_all.csv")
 saveprettycsv(a1, pathjourn, "purename_counts_dens.csv")
@@ -159,6 +183,7 @@ saveprettycsv(a2, pathjourn, "purename_counts_sos.csv")
 saveprettycsv(a3, pathjourn, "purename_counts_dielec.csv")
 saveprettycsv(a4, pathjourn, "purename_counts_cpmol.csv")
 saveprettycsv(a5, pathjourn, "purename_counts_hmol.csv")
+saveprettycsv(a6, pathjourn, "purename_counts_hvap.csv")
 
 saveprettycsv(b, pathcomp, "purecomp_counts_all.csv")
 saveprettycsv(b1, pathcomp, "purecomp_counts_dens.csv")
@@ -166,6 +191,7 @@ saveprettycsv(b2, pathcomp, "purecomp_counts_sos.csv")
 saveprettycsv(b3, pathcomp, "purecomp_counts_dielec.csv")
 saveprettycsv(b4, pathcomp, "purecomp_counts_cpmol.csv")
 saveprettycsv(b5, pathcomp, "purecomp_counts_hmol.csv")
+saveprettycsv(b6, pathcomp, "purecomp_counts_hvap.csv")
 
 # save pickle
 saveprettypickle(dfbig, pathdf, "alldata_pure.pkl")    
@@ -174,6 +200,7 @@ saveprettypickle(df2, pathdf, "sos_pure.pkl")
 saveprettypickle(df3, pathdf, "dielec_pure.pkl") 
 saveprettypickle(df4, pathdf, "cpmol_pure.pkl") 
 saveprettypickle(df5, pathdf, "hmol_pure.pkl") 
+saveprettypickle(df6, pathdf, "hvap_pure.pkl")
 
 saveprettypickle(a, pathjourn, "purename_counts_all.pkl")
 saveprettypickle(a1, pathjourn, "purename_counts_dens.pkl")
@@ -181,6 +208,7 @@ saveprettypickle(a2, pathjourn, "purename_counts_sos.pkl")
 saveprettypickle(a3, pathjourn, "purename_counts_dielec.pkl")
 saveprettypickle(a4, pathjourn, "purename_counts_cpmol.pkl")
 saveprettypickle(a5, pathjourn, "purename_counts_hmol.pkl")
+saveprettypickle(a6, pathjourn, "purename_counts_hvap.pkl")
 
 saveprettypickle(b, pathcomp, "purecomp_counts_all.pkl")
 saveprettypickle(b1, pathcomp, "purecomp_counts_dens.pkl")
@@ -188,6 +216,7 @@ saveprettypickle(b2, pathcomp, "purecomp_counts_sos.pkl")
 saveprettypickle(b3, pathcomp, "purecomp_counts_dielec.pkl")
 saveprettypickle(b4, pathcomp, "purecomp_counts_cpmol.pkl")
 saveprettypickle(b5, pathcomp, "purecomp_counts_hmol.pkl") 
+saveprettypickle(b6, pathcomp, "purecomp_counts_hvap.pkl")
 
 
 def SMILESchk(df, SMILES):
@@ -203,24 +232,39 @@ df3D, a3D, b3D = dfpretty(dfD, "Relative permittivity at zero frequency")
 df4D, a4D, b4D = dfpretty(dfD, "Molar heat capacity at constant pressure, J/K/mol")
 df5D, a5D, b5D = dfpretty(dfD, "Molar enthalpy, kJ/mol")
 
+df6D = SMILESchk(dfhvap, S.SMILES)
+a6D = df6D["filename"].value_counts()
+a6D = a6D.reset_index()
+a6D.rename(columns={"index":"Filename","filename":"Count"},inplace=True)
+b6D = df6D["InChI"].value_counts()    
+b6D = b6D.reset_index()    
+b6D.rename(columns={"index":"InChI","InChI":"Count"},inplace=True)    
+b6D["Component"] = b6D.InChI.apply(lambda x: resolve_cached(x, "iupac_name"))     
+b6D["SMILES"] = b6D.InChI.apply(lambda x: resolve_cached(x, "smiles"))
+
+
+
 # save csv with ; delimiter  
 saveprettycsv(df1D, pathdf, "dens_pure_BDC.csv") 
 saveprettycsv(df2D, pathdf, "sos_pure_BDC.csv") 
 saveprettycsv(df3D, pathdf, "dielec_pure_BDC.csv") 
 saveprettycsv(df4D, pathdf, "cpmol_pure_BDC.csv") 
 saveprettycsv(df5D, pathdf, "hmol_pure_BDC.csv") 
+saveprettycsv(df6D, pathdf, "hvap_pure_BDC.csv")
 
 saveprettycsv(a1D, pathjourn, "purename_counts_dens_BDC.csv")
 saveprettycsv(a2D, pathjourn, "purename_counts_sos_BDC.csv")
 saveprettycsv(a3D, pathjourn, "purename_counts_dielec_BDC.csv")
 saveprettycsv(a4D, pathjourn, "purename_counts_cpmol_BDC.csv")
 saveprettycsv(a5D, pathjourn, "purename_counts_hmol_BDC.csv")
+saveprettycsv(a6D, pathjourn, "purename_counts_hvap_BDC.csv")
 
 saveprettycsv(b1D, pathcomp, "purecomp_counts_dens_BDC.csv")
 saveprettycsv(b2D, pathcomp, "purecomp_counts_sos_BDC.csv")
 saveprettycsv(b3D, pathcomp, "purecomp_counts_dielec_BDC.csv")
 saveprettycsv(b4D, pathcomp, "purecomp_counts_cpmol_BDC.csv")
 saveprettycsv(b5D, pathcomp, "purecomp_counts_hmol_BDC.csv")
+saveprettycsv(b6D, pathcomp, "purecomp_counts_hvap_BDC.csv")
 
 # save pickle 
 saveprettypickle(df1D, pathdf, "dens_pure_BDC.pkl") 
@@ -228,17 +272,19 @@ saveprettypickle(df2D, pathdf, "sos_pure_BDC.pkl")
 saveprettypickle(df3D, pathdf, "dielec_pure_BDC.pkl") 
 saveprettypickle(df4D, pathdf, "cpmol_pure_BDC.pkl") 
 saveprettypickle(df5D, pathdf, "hmol_pure_BDC.pkl") 
+saveprettypickle(df6D, pathdf, "hvap_pure_BDC.pkl")
 
 saveprettypickle(a1D, pathjourn, "purename_counts_dens_BDC.pkl")
 saveprettypickle(a2D, pathjourn, "purename_counts_sos_BDC.pkl")
 saveprettypickle(a3D, pathjourn, "purename_counts_dielec_BDC.pkl")
 saveprettypickle(a4D, pathjourn, "purename_counts_cpmol_BDC.pkl")
 saveprettypickle(a5D, pathjourn, "purename_counts_hmol_BDC.pkl")
+saveprettypickle(a6D, pathjourn, "purename_counts_hvap_BDC.pkl")
 
 saveprettypickle(b1D, pathcomp, "purecomp_counts_dens_BDC.pkl")
 saveprettypickle(b2D, pathcomp, "purecomp_counts_sos_BDC.pkl")
 saveprettypickle(b3D, pathcomp, "purecomp_counts_dielec_BDC.pkl")
 saveprettypickle(b4D, pathcomp, "purecomp_counts_cpmol_BDC.pkl")
 saveprettypickle(b5D, pathcomp, "purecomp_counts_hmol_BDC.pkl") 
-
+saveprettypickle(b6D, pathcomp, "purecomp_counts_hvap_BDC.pkl")
 

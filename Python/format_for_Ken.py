@@ -35,8 +35,8 @@ import numpy as np
 import pandas as pd
 
 # Read in property data produced from puresrch.py and binsrch.py
-pathdfp = "/home/bmanubay/.thermoml/tables/Ken/Pure-Solvents/Property data/"
-pathdfm = "/home/bmanubay/.thermoml/tables/Ken/Binary-Mixtures/Property data/"
+pathdfp = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Pure-Solvents/Property data/"
+pathdfm = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Binary-Mixtures/Property data/"
 
 a1 = pd.read_csv(pathdfp+"dens_pure.csv", sep=';')   
 a2 = pd.read_csv(pathdfp+"hvap_pure.csv", sep=';')
@@ -59,22 +59,22 @@ c3 = pd.merge(a3,b3,how='outer',on=['filename'])
 # Find unique compoounds/mixtures for each journal in merged datasets 
 d1 = c1.groupby('filename').components.unique()
 d1 = d1.reset_index()
-d1.columns = ['filename', 'Pure_Mass_Density_Molecules']
+d1.columns = ['filename', 'Mass density, kg/m3']
 e1 = c1.groupby('filename').components_mix.unique()
 e1 = e1.reset_index()
-e1.columns = ['filename', 'Binary_Mass_Density_Mixtures']
+e1.columns = ['filename', 'Mass density, kg/m3_binary']
 d2 = c2.groupby('filename').components.unique()
 d2 = d2.reset_index()
-d2.columns = ['filename', 'Pure_Hvap_Molecules']
+d2.columns = ['filename', 'Molar enthalpy of vaporization or sublimation, kJ/mol']
 e2 = c2.groupby('filename').components_mix.unique()
 e2 = e2.reset_index()
-e2.columns = ['filename', 'Binary_Excess_Enthalpy_Mixtures']
+e2.columns = ['filename', 'Excess molar enthalpy (molar enthalpy of mixing), kJ/mol']
 d3 = c3.groupby('filename').components.unique()
 d3 = d3.reset_index()
-d3.columns = ['filename', 'Pure_Cp_Molecules']
+d3.columns = ['filename', 'Molar heat capacity at constant pressure, J/K/mol']
 e3 = c3.groupby('filename').components_mix.unique()
 e3 = e3.reset_index()
-e3.columns = ['filename', 'Binary_Excess_Cp_Mixtures']
+e3.columns = ['filename', 'Excess molar heat capacity, J/K/mol']
 
 # Merge the unique component/mixture list with filename as index
 f1 = pd.merge(d1,e1,how='outer',on=['filename'])
@@ -88,13 +88,12 @@ g2 = pd.merge(g1,f3,how='outer',on=['filename'])
 g2 = g2.astype('str')
 
 # Format strings in columns
-g2['Pure_Mass_Density_Molecules'] = g2['Pure_Mass_Density_Molecules'].map(lambda x: x.lstrip('"[').rstrip(']"'))
-g2['Binary_Mass_Density_Mixtures'] = g2['Binary_Mass_Density_Mixtures'].map(lambda x: x.lstrip('"[').rstrip(']"'))
-g2['Pure_Hvap_Molecules'] = g2['Pure_Hvap_Molecules'].map(lambda x: x.lstrip('"[').rstrip(']"'))
-g2['Binary_Excess_Enthalpy_Mixtures'] = g2['Binary_Excess_Enthalpy_Mixtures'].map(lambda x: x.lstrip('"[').rstrip(']"'))
-g2['Pure_Cp_Molecules'] = g2['Pure_Cp_Molecules'].map(lambda x: x.lstrip('"[').rstrip(']"'))
-g2['Binary_Excess_Cp_Mixtures'] = g2['Binary_Excess_Cp_Mixtures'].map(lambda x: x.lstrip('"[').rstrip(']"'))
+g2['Mass density, kg/m3'] = g2['Mass density, kg/m3'].map(lambda x: x.lstrip('"[').rstrip(']"'))
+g2['Mass density, kg/m3_binary'] = g2['Mass density, kg/m3_binary'].map(lambda x: x.lstrip('"[').rstrip(']"'))
+g2['Molar enthalpy of vaporization or submlimation, kJ/mol'] = g2['Molar enthalpy of vaporization or sublimation, kJ/mol'].map(lambda x: x.lstrip('"[').rstrip(']"'))
+g2['Excess molar enthalpy (molar enthalpy of mixing), kJ/mol'] = g2['Excess molar enthalpy (molar enthalpy of mixing), kJ/mol'].map(lambda x: x.lstrip('"[').rstrip(']"'))
+g2['Molar heat capacity at constant pressure, J/K/mol'] = g2['Molar heat capacity at constant pressure, J/K/mol'].map(lambda x: x.lstrip('"[').rstrip(']"'))
+g2['Excess molar heat capacity, J/K/mol'] = g2['Excess molar heat capacity, J/K/mol'].map(lambda x: x.lstrip('"[').rstrip(']"'))
 
-print(g2)
 
-g2.to_json('journals_for_Ken.json')
+g2.to_json('journals_for_Ken.json', orient='index')

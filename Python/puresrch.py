@@ -103,10 +103,10 @@ df = df[df['Pressure, kPa'] < 102000.]
 
 df.dropna(axis=1, how='all', inplace=True)
 
-df["filename"] = df["filename"].map(lambda x: x.lstrip('/home/bmanubay/.thermoml/'))
+df["filename"] = df["filename"].map(lambda x: x.replace(' ', '')[25:])
 df["filename"] = df.filename.map(lambda x: x.replace(' ', '')[:-4])
 
-dfhvap["filename"] = dfhvap["filename"].map(lambda x: x.lstrip('/home/bmanubay/.thermoml/'))
+dfhvap["filename"] = dfhvap["filename"].map(lambda x: x.replace(' ', '')[25:])
 dfhvap["filename"] = dfhvap.filename.map(lambda x: x.replace(' ', '')[:-4])
 
 def dfpretty(df, prop):
@@ -158,9 +158,9 @@ df5, a5, b5 = dfpretty(df, "Molar enthalpy, kJ/mol")
 
 
 
-pathdf = "/home/bmanubay/.thermoml/tables/Ken/Pure/Property data/"
-pathjourn = "/home/bmanubay/.thermoml/tables/Ken/Pure/Journal name counts/"
-pathcomp = "/home/bmanubay/.thermoml/tables/Ken/Pure/Component counts/"
+pathdf = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Pure-Solvents/Property data/"
+pathjourn = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Pure-Solvents/Journal name counts/"
+pathcomp = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Pure-Solvents/Component counts/"
 
 def saveprettycsv(df, path, filename):
     df.to_csv(path+filename, sep =';')

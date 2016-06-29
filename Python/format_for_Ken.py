@@ -86,12 +86,13 @@ g2['Excess molar heat capacity, J/K/mol'] = pd.Series(c1, index=g2.index)
 
 g2.to_json('journals_for_Ken.json', orient='index')
 
+# This was my attempt for formattting the JSON, but there are certain data types in the dataframe that aren't json serializable and I'm unsure of how to handle that
 results = {}
 for key, df_gb in g2.groupby('filename'):
     results[str(key)] = df_gb.to_dict('records')
 
 
-import json
-print json.dumps(results, indent=4)
+#import json
+#print json.dumps(results, indent=4)
 
 

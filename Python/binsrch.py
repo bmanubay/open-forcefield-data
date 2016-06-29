@@ -129,7 +129,7 @@ df = df[df['Pressure, kPa'] < 102000.]
 
 df.dropna(axis=1, how='all', inplace=True)
 
-df["filename"] = df["filename"].map(lambda x: x.lstrip('/home/bmanubay/.thermoml/'))
+df["filename"] = df.filename.map(lambda x: x.replace(' ', '')[25:])
 df["filename"] = df.filename.map(lambda x: x.replace(' ', '')[:-4])
 
 def dfpretty(df, prop):
@@ -191,10 +191,10 @@ df6, a6, b6, c6 = dfpretty(df, "Speed of sound, m/s")
 df7, a7, b7, c7 = dfpretty(df, "Relative permittivity at zero frequency")
 
 
-pathdf = "/home/bmanubay/.thermoml/tables/Ken/Binary/Property data/"
-pathjourn = "/home/bmanubay/.thermoml/tables/Ken/Binary/Journal name counts/"
-pathcomp = "/home/bmanubay/.thermoml/tables/Ken/Binary/Component counts/"
-pathmix = "/home/bmanubay/.thermoml/tables/Ken/Binary/Mixture counts/"
+pathdf = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Binary-Mixtures/Property data/"
+pathjourn = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Binary-Mixtures/Journal name counts/"
+pathcomp = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Binary-Mixtures/Component counts/"
+pathmix = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Binary-Mixtures/Mixture counts/"
 
 def saveprettycsv(df, path, filename):
     df.to_csv(path+filename, sep =';')

@@ -1,0 +1,7 @@
+;Mixture;Count;x1;x2;SMILES1;SMILES2
+0;ethanol__methanol;105;ethanol;methanol;CCO;CO
+1;methanol__2-propanol;105;methanol;2-propanol;CO;CC(C)O
+2;methanol__1-propanol;105;methanol;1-propanol;CO;CCCO
+3;methanol__1-butanol;105;methanol;1-butanol;CO;CCCCO
+4;methanol__2-methyl-1-propanol;105;methanol;2-methyl-1-propanol;CO;CC(C)CO
+5;methanol__2-methyl-2-propanol;95;methanol;2-methyl-2-propanol;CO;CC(C)(C)O

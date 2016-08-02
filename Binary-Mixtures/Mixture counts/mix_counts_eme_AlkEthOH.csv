@@ -1,0 +1,56 @@
+;Mixture;Count;x1;x2;SMILES1;SMILES2
+0;methanol__water;140;methanol;water;CO;O
+2;ethanol__water;83;ethanol;water;CCO;O
+3;ethanol__methanol;76;ethanol;methanol;CCO;CO
+4;ethanol__2-propanol;76;ethanol;2-propanol;CCO;CC(C)O
+5;ethanol__1-propanol;74;ethanol;1-propanol;CCO;CCCO
+10;ethanol, 2-ethoxy-__cyclohexane;58;ethanol, 2-ethoxy-;cyclohexane;CCOCCO;C1CCCCC1
+14;1-pentanol__cyclohexane;51;1-pentanol;cyclohexane;CCCCCO;C1CCCCC1
+15;hexane__ethanol, 2-ethoxy-;51;hexane;ethanol, 2-ethoxy-;CCCCCC;CCOCCO
+16;2-propanol__water;45;2-propanol;water;CC(C)O;O
+17;pentan-1-ol__isooctane;42;pentan-1-ol;isooctane;CCCCCO;CCCCCC(C)C
+18;2,2,4-trimethylpentane__2-pentanol;42;2,2,4-trimethylpentane;2-pentanol;CC(C)CC(C)(C)C;CCCC(C)O
+19;pentan-1-ol__heptane;42;pentan-1-ol;heptane;CCCCCO;CCCCCCC
+21;n-heptane__2-pentanol;42;n-heptane;2-pentanol;CCCCCCC;CCCC(C)O
+24;1-butanol__cyclohexane;38;1-butanol;cyclohexane;CCCCO;C1CCCCC1
+26;1-butanol__methylcyclohexane;38;1-butanol;methylcyclohexane;CCCCO;CC1CCCCC1
+28;1-butanol__2,2,4-trimethylpentane;38;1-butanol;2,2,4-trimethylpentane;CCCCO;CC(C)CC(C)(C)C
+31;1-butanol__heptane;38;1-butanol;heptane;CCCCO;CCCCCCC
+37;1-butanol__2-methyltetrahydrofuran;33;1-butanol;2-methyltetrahydrofuran;CCCCO;CC1CCCO1
+38;1-butanol__tetrahydropyran;33;1-butanol;tetrahydropyran;CCCCO;C1CCOCC1
+39;cyclohexane__tetrahydropyran;32;cyclohexane;tetrahydropyran;C1CCCCC1;C1CCOCC1
+41;1-butanol__hexane;23;1-butanol;hexane;CCCCO;CCCCCC
+42;neohexane__tetrahydrofuran;23;neohexane;tetrahydrofuran;CCC(C)(C)C;C1CCOC1
+43;diisopropyl__tetrahydrofuran;23;diisopropyl;tetrahydrofuran;CC(C)C(C)C;C1CCOC1
+53;2,3-dimethylbutane__ether, dipropyl;20;2,3-dimethylbutane;ether, dipropyl;CC(C)C(C)C;CCCOCCC
+54;tetramethylene oxide__dipropyl ether;20;tetramethylene oxide;dipropyl ether;C1CCOC1;CCCOCCC
+58;ethanol__methoxymethane;19;ethanol;methoxymethane;CCO;COC
+60;1-propanol__methoxymethane;19;1-propanol;methoxymethane;CCCO;COC
+61;ethanol__isopropyl ether;19;ethanol;isopropyl ether;CCO;CC(C)OC(C)C
+62;ethanol__2,2,4-trimethylpentane;19;ethanol;2,2,4-trimethylpentane;CCO;CC(C)CC(C)(C)C
+63;1-butanol__methoxymethane;19;1-butanol;methoxymethane;CCCCO;COC
+66;butane, 2,2-dimethyl-__ether, dipropyl;19;butane, 2,2-dimethyl-;ether, dipropyl;CCC(C)(C)C;CCCOCCC
+67;cyclohexane__1,4-dioxane;19;cyclohexane;1,4-dioxane;C1CCCCC1;C1COCCO1
+68;methanol__methoxymethane;19;methanol;methoxymethane;CO;COC
+71;isopropyl ether__2,2,4-trimethylpentane;19;isopropyl ether;2,2,4-trimethylpentane;CC(C)OC(C)C;CC(C)CC(C)(C)C
+76;ethanol__tetrahydropyran;19;ethanol;tetrahydropyran;CCO;C1CCOCC1
+78;1-pentanol__hexane;18;1-pentanol;hexane;CCCCCO;CCCCCC
+79;hexane__cyclohexane;18;hexane;cyclohexane;CCCCCC;C1CCCCC1
+89;ethanol__hexane;17;ethanol;hexane;CCO;CCCCCC
+91;2-methyl-1-propanol__1-methyl-1-(1-methylethoxy)ethane;17;2-methyl-1-propanol;1-methyl-1-(1-methylethoxy)ethane;CC(C)CO;CC(C)OC(C)C
+99;1-propanol__heptane;16;1-propanol;heptane;CCCO;CCCCCCC
+106;tetrahydropyran__heptane;14;tetrahydropyran;heptane;C1CCOCC1;CCCCCCC
+107;n-hexane__tetrahydropyran;14;n-hexane;tetrahydropyran;CCCCCC;C1CCOCC1
+113;1-butanol__1-methyl-1-(1-methylethoxy)ethane;13;1-butanol;1-methyl-1-(1-methylethoxy)ethane;CCCCO;CC(C)OC(C)C
+115;1-methyl-1-(1-methylethoxy)ethane__heptane;12;1-methyl-1-(1-methylethoxy)ethane;heptane;CC(C)OC(C)C;CCCCCCC
+116;1-butanol__cyclopentane;11;1-butanol;cyclopentane;CCCCO;C1CCCC1
+124;1-hexanol__cyclopentane;11;1-hexanol;cyclopentane;CCCCCCO;C1CCCC1
+127;1-pentanol__cyclopentane;10;1-pentanol;cyclopentane;CCCCCO;C1CCCC1
+129;pentan-1-ol__tert-pentyl alcohol;10;pentan-1-ol;tert-pentyl alcohol;CCCCCO;CCC(C)(C)O
+131;propan-1-ol__tert-pentyl alcohol;10;propan-1-ol;tert-pentyl alcohol;CCCO;CCC(C)(C)O
+132;butan-1-ol__tert-pentyl alcohol;10;butan-1-ol;tert-pentyl alcohol;CCCCO;CCC(C)(C)O
+137;ethanol__tert-pentyl alcohol;10;ethanol;tert-pentyl alcohol;CCO;CCC(C)(C)O
+141;methanol__tert-pentyl alcohol;10;methanol;tert-pentyl alcohol;CO;CCC(C)(C)O
+154;2-propanol__cyclohexane;9;2-propanol;cyclohexane;CC(C)O;C1CCCCC1
+157;1,4-dioxane__tetrahydropyran;9;1,4-dioxane;tetrahydropyran;C1COCCO1;C1CCOCC1
+158;1-pentanol__tetrahydropyran;9;1-pentanol;tetrahydropyran;CCCCCO;C1CCOCC1

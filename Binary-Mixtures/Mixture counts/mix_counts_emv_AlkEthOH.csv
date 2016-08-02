@@ -1,0 +1,8 @@
+;Mixture;Count;x1;x2;SMILES1;SMILES2
+6;2-methyl-2-butanol__tetrahydrofuran;39;2-methyl-2-butanol;tetrahydrofuran;CCC(C)(C)O;C1CCOC1
+8;1-butanol__hexane;31;1-butanol;hexane;CCCCO;CCCCCC
+9;ethanol__hexane;23;ethanol;hexane;CCO;CCCCCC
+10;hexane__ether, methyl tert-pentyl;19;hexane;ether, methyl tert-pentyl;CCCCCC;CCC(C)(C)OC
+14;cyclohexane__tetrahydropyran;14;cyclohexane;tetrahydropyran;C1CCCCC1;C1CCOCC1
+15;n-hexane__tetrahydropyran;14;n-hexane;tetrahydropyran;CCCCCC;C1CCOCC1
+19;tetrahydropyran__heptane;14;tetrahydropyran;heptane;C1CCOCC1;CCCCCCC

@@ -1,0 +1,15 @@
+;Mixture;Count;x1;x2;SMILES1;SMILES2
+0;tert-pentyl alcohol__water;16;tert-pentyl alcohol;water;CCC(C)(C)O;O
+1;2-methyl-1-butanol__water;15;2-methyl-1-butanol;water;CCC(C)CO;O
+2;1-butanol, 3-methyl-__water;15;1-butanol, 3-methyl-;water;CC(C)CCO;O
+3;pentan-2-ol__water;13;pentan-2-ol;water;CCCC(C)O;O
+5;3-methyl-2-butanol__water;10;3-methyl-2-butanol;water;CC(C)C(C)O;O
+7;1-butanol__water;8;1-butanol;water;CCCCO;O
+24;tert-butyl ethyl ether__water;4;tert-butyl ethyl ether;water;CCOC(C)(C)C;O
+42;tert-amyl methyl ether__water;4;tert-amyl methyl ether;water;CCC(C)(C)OC;O
+89;methylcyclopentane__methyl cellosolve;1;methylcyclopentane;methyl cellosolve;CC1CCCC1;COCCO
+92;methyl cellosolve__cyclohexane;1;methyl cellosolve;cyclohexane;COCCO;C1CCCCC1
+99;methyl cellosolve__n-heptane;1;methyl cellosolve;n-heptane;COCCO;CCCCCCC
+106;methyl cellosolve__n-hexane;1;methyl cellosolve;n-hexane;COCCO;CCCCCC
+116;methyl cellosolve__cyclooctane;1;methyl cellosolve;cyclooctane;COCCO;C1CCCCCCC1
+118;methylcyclohexane__methyl cellosolve;1;methylcyclohexane;methyl cellosolve;CC1CCCCC1;COCCO

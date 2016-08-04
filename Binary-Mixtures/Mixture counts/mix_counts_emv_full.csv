@@ -1,0 +1,268 @@
+;Mixture;Count
+0;n-hexane__dimethyl carbonate;300
+1;water__2-hydroxyethylammonium acetate;195
+2;methanol__2-hydroxyethylammonium acetate;195
+3;ethanol__2-hydroxyethylammonium acetate;195
+4;acetone__heptane;162
+5;1-butanol__1-hexanamine;136
+6;1-hexanamine__heptane;136
+7;1,2-ethanediol__water;135
+8;1,2-propanediol__water;114
+9;1,4-butanediol__water;109
+10;ethylbenzene__cyclohexanone;98
+11;1,3-propanediol__water;90
+12;propyl methanoate__decane;72
+13;ethyl methanoate__decane;72
+14;2,3-butanediol__N-methyl-2-pyrrolidone;69
+15;decane__butyl methanoate;69
+16;N,N-dimethylformamide__2,3-butanediol;67
+17;ethanol__3-methylbutyl ethanoate;60
+18;methanol__3-methylbutyl ethanoate;60
+19;butan-1-ol__3-methylbutyl ethanoate;60
+20;N-methylpiperidine__water;60
+21;1,2-hexanediol__water;60
+22;propan-1-ol__3-methylbutyl ethanoate;60
+23;2-propanol__3-methylbutyl ethanoate;60
+24;N,N-dimethylformamide__1,3-propanediol;58
+25;2-heptanone__N,N-diethylethanamine;56
+26;2-methylaniline__4-methylpyridine;54
+27;2-methylaniline__azine;54
+28;2-methylaniline__3-methylpyridine;54
+29;2-heptanone__dipropylamine;54
+30;2-methylaniline__2-methylpyridine;54
+31;2-methylpiperidine__water;52
+32;1,3-propanediol__2-pyrrolidinone;47
+33;vinyl acetate__methyl tert-butyl ether;46
+34;allyl methacrylate__methyl tert-butyl ether;46
+35;methacrylic acid__methyl tert-butyl ether;46
+36;butyl methacrylate__methyl tert-butyl ether;46
+37;N,N-dimethylformamide__1-heptanol;44
+38;N,N-dimethylformamide__1-hexanol;44
+39;N,N-dimethylformamide__pentan-1-ol;44
+40;1,2-ethanediol__2-pyrrolidinone;43
+41;1,3-butanediol__N-methyl-2-pyrrolidone;43
+42;1,2-diaminoethane__1-hydroxyhexane;42
+43;1,2-butanediol__N-methyl-2-pyrrolidone;42
+44;1,3-butanediol__2-pyrrolidinone;40
+45;1,4-butanediol__2-pyrrolidinone;40
+46;N,N-dimethylformamide__1,4-butanediol;40
+47;2,3-butanediol__2-pyrrolidinone;40
+48;butan-1-ol__butane, 1,4-dihydroxy-;40
+49;2-methyl-2-butanol__tetrahydrofuran;39
+50;2-methyl-2-butanol__n-propylamine;39
+51;n-propylamine__tetrahydrofuran;39
+52;1,2-butanediol__2-pyrrolidinone;38
+53;1,4-butanediol__N-methyl-2-pyrrolidone;38
+54;2-methyl-2-propanol__propyl butanoate;38
+55;2-methyl-2-propanol__propyl propanoate;37
+56;1-hexanol__1-octene;35
+57;1,5-pentanediol__2-pyrrolidinone;35
+58;2-methyl-2-propanol__propyl ethanoate;35
+59;1-butanol__triethylamine;35
+60;2-methyl-2-propanol__propyl methanoate;35
+61;methyl methanoate__decane;34
+62;1-hexanol__1-hexene;32
+63;1-hexanol__1-decene;32
+64;1,2-dibromoethane__1-decanol;32
+65;1-decanol__tetrachloroethene;32
+66;2-heptanone__N-butylbutanamine;32
+67;cyclohexane__hexadecane;32
+68;1,2-dichloroethane__1-decanol;32
+69;1-butanol__hexane;31
+70;heptane__2-butanamine;31
+71;N,N-dimethylformamide__1,2-ethanediol;31
+72;N,N-dimethylformamide__1,3-butanediol;31
+73;N,N-dimethylformamide__1,5-pentanediol;30
+74;N,N-dimethylformamide__1,2-butanediol;27
+75;n-hexylamine__heptane;26
+76;n-propylamine__heptane;24
+77;2-aminopropane__heptane;24
+78;ethanol__hexane;23
+79;hexamethyleneimine__heptane;23
+80;n-propyl alcohol__formamide;22
+81;1-octanamine__heptane;22
+82;toluol__acetic acid, 1,1-dimethylethyl ester;22
+83;ethylbenzene__acetic acid, 1,1-dimethylethyl ester;22
+84;benzene__acetic acid, 1,1-dimethylethyl ester;22
+85;isopropanol__formamide;22
+86;hexane__triethylamine;22
+87;butylamine__heptane;21
+88;chloroform__cyclohexane;20
+89;heptane__cyclopentanamine;20
+90;hexane__ether, methyl tert-pentyl;19
+91;1,2-dichloropropane__methyl propanoate;19
+92;1,2-dichloropropane__2-[2-(2-methoxyethoxy)ethoxy]ethanol;19
+93;1,2-dichloropropane__3,6-dioxa-1-decanol;19
+94;1,2-dichloropropane__2-(2-(2-butoxyethoxy)ethoxy)ethanol;19
+95;1,2-dichloropropane__methyl butanoate;19
+96;1,2-dichloropropane__2-(2-(2-ethoxyethoxy)ethoxy)ethanol;19
+97;1,2-dichloropropane__2-(2-propoxyethoxy)ethanol;19
+98;1,2-dichloropropane__methyl ethanoate;19
+99;amylamine__heptane;18
+100;heptane__dipropylamine;18
+101;2-methyl-1-propanamine__heptane;18
+102;propyl propanoate__heptane;17
+103;propyl propanoate__heptadecane;17
+104;ethyl propanoate__nonane;17
+105;propyl propanoate__nonane;17
+106;propyl propanoate__undecane;17
+107;2-methyl-1-propanol__2-chlorobutane;17
+108;methyl propanoate__tridecane;17
+109;methyl propanoate__pentadecane;17
+110;butyl propanoate__undecane;17
+111;ethyl propanoate__tridecane;17
+112;butyl propanoate__pentadecane;17
+113;amyl propionate__pentadecane;17
+114;ethyl propanoate__pentadecane;17
+115;heptane__methyl propanoate;17
+116;nonane__methyl propanoate;17
+117;ethyl propanoate__undecane;17
+118;N,N-dipropylpropanamine__heptane;17
+119;propyl propanoate__pentadecane;17
+120;heptane__cyclododecylamine;17
+121;butyl propanoate__tridecane;17
+122;ethanol__triethylamine;17
+123;heptane__butyl propanoate;17
+124;nonane__butyl propanoate;17
+125;methyl propanoate__undecane;17
+126;chloroform__tetramethylene oxide;16
+127;propyl propanoate__tridecane;16
+128;methyl propanoate__heptadecane;16
+129;benzene__2-chlorobutane;16
+130;heptane__amyl propionate;16
+131;butyl butanoate__1,6-dibromohexane;16
+132;amyl propionate__undecane;16
+133;2-chlorobutane__n-butyl acetate;16
+134;nonane__amyl propionate;16
+135;amyl propionate__heptadecane;16
+136;1,2-dibromoethane__butyl ethanoate;16
+137;butyl propanoate__heptadecane;16
+138;amyl propionate__tridecane;16
+139;heptane__cycloheptylamine;16
+140;ethyl propanoate__heptadecane;16
+141;ethyl propanoate__heptane;16
+142;1,5-dibromopentane__butyl propanoate;16
+143;1,3-dibromopropane__butyl ethanoate;15
+144;methyl sulfoxide__4-chlorotoluene;15
+145;methyl sulfoxide__1,2-dichlorobenzene;15
+146;methyl sulfoxide__1,2,4-trichlorobenzene;15
+147;butyl butanoate__1,5-dibromopentane;15
+148;methyl sulfoxide__1,3-dichlorobenzene;15
+149;1,2-dibromoethane__butyl methanoate;15
+150;methyl sulfoxide__3-chlorotoluene;15
+151;ethanol__DMF;15
+152;heptane__triamylamine;15
+153;toluene__tert-butyl chloride;15
+154;heptylamine__heptane;15
+155;methyl sulfoxide__o-nitrotoluene;15
+156;methyl sulfoxide__3-nitrotoluene;15
+157;1,4-dibromobutane__butyl propanoate;15
+158;2-methyl-1-propanol__n-butyl acetate;15
+159;N,N-diethylethanamine__heptane;15
+160;1,5-dibromopentane__butyl methanoate;14
+161;1,2-dimethylbenzene__2-methylaniline;14
+162;butyl propanoate__1,6-dibromohexane;14
+163;heptane__3-pentylamine;14
+164;tetrahydrofuran__1,2,4-trichlorobenzene;14
+165;n-hexane__tetrahydropyran;14
+166;1,2-dimethylbenzene__tetrahydropyran;14
+167;butane, 1,4-dihydroxy-__water;14
+168;1-butanol__2-pyrrolidinone;14
+169;2-chlorobutane__1,2-dimethylbenzene;14
+170;aniline__chloroform;14
+171;1,3-dibromopropane__butyl propanoate;14
+172;2-methylaniline__toluene;14
+173;2-methylaniline__heptane;14
+174;2,3-butanediol__water;14
+175;butyl ethanoate__1,6-dibromohexane;14
+176;1,2-dimethylbenzene__tert-butyl chloride;14
+177;1,3-dimethylbenzene__tetrahydropyran;14
+178;1,2-butanediol__water;14
+179;benzene__2-methylaniline;14
+180;1,4-dimethylbenzene__tetrahydropyran;14
+181;butyl butanoate__1,3-dibromopropane;14
+182;tetrahydropyran__heptane;14
+183;1,2-dibromoethane__butyl propanoate;14
+184;benzene__tetrahydropyran;14
+185;2-methylaniline__1,4-dimethylbenzene;14
+186;2-methylaniline__hexane;14
+187;methyl sulfoxide__2-chlorotoluene;14
+188;trimethylene glycol__water;14
+189;1-butanamine, 3-methyl-__heptane;14
+190;aniline__tetrahydropyran;14
+191;cyclohexane__tetrahydropyran;14
+192;phenylmethylamine__tetrahydropyran;14
+193;2-methylaniline__cyclohexane;14
+194;2-methylaniline__1,3-dimethylbenzene;14
+195;chloroform__2-methylaniline;14
+196;2-propanol__2-pyrrolidinone;14
+197;ethanol__2-pyrrolidinone;14
+198;1,3-butanediol__water;14
+199;1-propanol__2-pyrrolidinone;14
+200;2-methylaniline__tetrahydropyran;14
+201;cyclohexylamine__heptane;14
+202;toluene__tetrahydropyran;14
+203;3-chlorotoluene__tetrahydrofuran;14
+204;4-chlorotoluene__tetrahydrofuran;13
+205;tetrahydrofuran__1,3-dichlorobenzene;13
+206;1,5-dibromopentane__butyl ethanoate;13
+207;benzene__tert-butyl chloride;13
+208;butyl butanoate__1,4-dibromobutane;13
+209;2-chlorobutane__1,3-dimethylbenzene;13
+210;butyl methanoate__1,6-dibromohexane;13
+211;1,4-dimethylbenzene__tert-butyl chloride;13
+212;2-pentanone__N-methyl-2-pyrrolidone;13
+213;1,4-dibromobutane__butyl methanoate;13
+214;2-chlorobutane__1,4-dimethylbenzene;13
+215;1,3-dimethylbenzene__tert-butyl chloride;13
+216;1,2-dibromoethane__butyl butanoate;13
+217;1,2-dichlorobenzene__tetrahydrofuran;13
+218;1,3-dibromopropane__butyl methanoate;13
+219;4-methyl-2-pentanone__N-methyl-2-pyrrolidone;13
+220;1,4-dibromobutane__butyl ethanoate;13
+221;tributylamine__heptane;12
+222;2-propanamine, 2-methyl-__heptane;12
+223;2-nitrotoluene__tetrahydrofuran;12
+224;3-nitrotoluene__tetrahydrofuran;12
+225;2-chlorobutane__toluene;12
+226;2-chlorotoluene__tetrahydrofuran;12
+227;DMF__tetrahydrofuran;12
+228;N-butylbutanamine__heptane;12
+229;2-methyl-2-propanol__N-methyl-2-pyrrolidone;11
+230;heptane__heptamethyleneimine;11
+231;toluene__dimethyl carbonate;11
+232;cyclohexanone__N-methyl-2-pyrrolidone;11
+233;benzene__dimethyl carbonate;11
+234;dodecylamine__heptane;11
+235;butanone__N-methyl-2-pyrrolidone;11
+236;cyclohexane__butyl ethanoate;11
+237;3-pentanone__N-methyl-2-pyrrolidone;11
+238;methyl sulfoxide__4-methyl-2-pentanone;10
+239;butanone__1,3-dichlorobenzene;10
+240;o-nitrotoluene__acetophenone;10
+241;1,3-dimethylbenzene__butyl ethanoate;10
+242;2-chlorotoluene__acetophenone;10
+243;benzene__butyl ethanoate;10
+244;1,4-dimethylbenzene__butyl ethanoate;10
+245;acetophenone__3-nitrotoluene;10
+246;acetophenone__3-chlorotoluene;10
+247;1,2-dimethylbenzene__butyl ethanoate;10
+248;heptane__decylamine;10
+249;acetophenone__4-chlorotoluene;10
+250;3-diethylaminopropylamine__cyclohexane;9
+251;methyl sulfoxide__cyclohexanone;9
+252;1,1,1,3,3,3-hexafluoroisopropanol__water;9
+253;2-methyl-1-propanol__N-methyl-2-pyrrolidone;9
+254;toluene__butyl ethanoate;9
+255;2-propanol__1-methylethyl ethanoate;9
+256;methyl sulfoxide__2-pentanone;9
+257;3-methyl-1-butanol__N-methyl-2-pyrrolidone;9
+258;methanol__methyl ethanoate;9
+259;methyl sulfoxide__3-pentanone;9
+260;2-propanol__N-methyl-2-pyrrolidone;9
+261;methyl sulfoxide__butanone;9
+262;heptane__1-tetradecanamine;8
+263;benzene__N-methyl-2-pyrrolidone;7
+264;toluene__N-methyl-2-pyrrolidone;7
+265;cyclohexane__N-methyl-2-pyrrolidone;7
+266;heptane__dihydroazirine;4

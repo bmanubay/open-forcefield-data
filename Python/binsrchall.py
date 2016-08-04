@@ -1,0 +1,267 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr  8 13:33:13 2016
+
+@author: bmanubay
+"""
+
+import os
+import thermopyl as th 
+from thermopyl import thermoml_lib
+import cirpy
+import numpy as np
+import pandas as pd
+from sklearn.externals.joblib import Memory
+
+mem = Memory(cachedir="/home/bmanubay/.thermoml/")
+
+@mem.cache
+def resolve_cached(x, rtype):
+   return cirpy.resolve(x, rtype)
+
+# Compounds of most interest as decide by David, Chris and Bryce   
+davmollist = ['2,2,4-trimethylpentane', 'cycloheptane', 'diisopropylether', 'isopropyl ether', 'dimethoxymethane', '2,3-dimethylbutane', '2,2-dimethylbutane', '3-methylpentane', 'neohexane', '4-methyl-2-pentanol', '2-methyl-2-pentanol', '1,1-diethoxyethane', 'tert-butanol', 'tetrahydrofuran', 'heptane', 'water', 'ethanol', '1-butanol', 'methyl tert-butyl ether']
+S = pd.DataFrame({'IUPAC_Names': davmollist}, columns = ['IUPAC_Names'])
+S["SMILES"] = S.IUPAC_Names.apply(lambda x: resolve_cached(x, "smiles"))
+
+
+df = th.pandas_dataframe()
+dt = list(df.columns)
+
+bad_filenames = ["/home/bmanubay/.thermoml/j.fluid.2013.12.014.xml"]  # This file confirmed to have possible data entry errors.
+df = df[~df.filename.isin(bad_filenames)]
+
+experiments = ["Mass density, kg/m3", "Excess molar enthalpy (molar enthalpy of mixing), kJ/mol", "Excess molar heat capacity, J/K/mol", "Excess molar volume, m3/mol", "Activity coefficient", "Speed of sound, m/s", "Relative permittivity at zero frequency"]
+
+ind_list = [df[exp].dropna().index for exp in experiments]
+ind = reduce(lambda x,y: x.union(y), ind_list)
+df = df.ix[ind]
+
+name_to_formula = pd.read_hdf("/home/bmanubay/.thermoml/compound_name_to_formula.h5", 'data')
+name_to_formula = name_to_formula.dropna()
+
+# Extract rows with two components
+df["n_components"] = df.components.apply(lambda x: len(x.split("__")))
+df = df[df.n_components == 2]
+df.dropna(axis=1, how='all', inplace=True)
+
+# Split components into separate columns (to use name_to_formula)
+df["x1"], df["x2"] =  zip(*df["components"].str.split('__').tolist())
+df['x2'].replace('', np.nan, inplace=True)
+df.dropna(subset=['x2'], inplace=True)
+
+# Strip rows not in liquid phase
+df = df[df['phase']=='Liquid']
+
+df["formula1"] = df.x1.apply(lambda chemical: name_to_formula[chemical])
+df["formula2"] = df.x2.apply(lambda chemical: name_to_formula[chemical])
+
+heavy_atoms = ["C", "O", "F", "N", "S", "B", "P", "Cl", "Br", "I"]
+desired_atoms = ["H"] + heavy_atoms
+
+df["n_atoms1"] = df.formula1.apply(lambda formula_string : thermoml_lib.count_atoms(formula_string))
+df["n_heavy_atoms1"] = df.formula1.apply(lambda formula_string : thermoml_lib.count_atoms_in_set(formula_string, heavy_atoms))
+df["n_desired_atoms1"] = df.formula1.apply(lambda formula_string : thermoml_lib.count_atoms_in_set(formula_string, desired_atoms))
+df["n_other_atoms1"] = df.n_atoms1 - df.n_desired_atoms1
+df["n_atoms2"] = df.formula2.apply(lambda formula_string : thermoml_lib.count_atoms(formula_string))
+df["n_heavy_atoms2"] = df.formula2.apply(lambda formula_string : thermoml_lib.count_atoms_in_set(formula_string, heavy_atoms))
+df["n_desired_atoms2"] = df.formula2.apply(lambda formula_string : thermoml_lib.count_atoms_in_set(formula_string, desired_atoms))
+df["n_other_atoms2"] = df.n_atoms2 - df.n_desired_atoms2
+
+df = df[df.n_other_atoms1 == 0]
+df = df[df.n_other_atoms2 == 0]
+
+df = df[df.n_heavy_atoms1 > 0]
+df = df[df.n_heavy_atoms2 > 0]
+df.dropna(axis=1, how='all', inplace=True)
+
+df["SMILES1"] = df.x1.apply(lambda x: resolve_cached(x, "smiles"))  # This should be cached via sklearn.
+df = df[df.SMILES1 != None]
+df.dropna(subset=["SMILES1"], inplace=True)
+df = df.ix[df.SMILES1.dropna().index]
+df["SMILES2"] = df.x2.apply(lambda x: resolve_cached(x, "smiles"))  # This should be cached via sklearn.
+df = df[df.SMILES2 != None]
+df.dropna(subset=["SMILES2"], inplace=True)
+df = df.ix[df.SMILES2.dropna().index]
+
+    
+df["cas1"] = df.x1.apply(lambda x: thermoml_lib.get_first_entry(resolve_cached(x, "cas")))  # This should be cached via sklearn.
+df["InChI1"] = df.x1.apply(lambda x: thermoml_lib.get_first_entry(resolve_cached(x, "stdinchikey")))
+df = df[df.cas1 != None]
+df = df.ix[df.cas1.dropna().index]
+df["cas2"] = df.x2.apply(lambda x: thermoml_lib.get_first_entry(resolve_cached(x, "cas")))  # This should be cached via sklearn.
+df["InChI2"] = df.x2.apply(lambda x: thermoml_lib.get_first_entry(resolve_cached(x, "stdinchikey")))
+df = df[df.cas2 != None]
+df = df.ix[df.cas2.dropna().index]
+
+
+# Neither names (components) nor smiles are unique.  Use CAS to ensure consistency.
+cannonical_smiles_lookup1 = df.groupby("cas1").SMILES1.first()
+cannonical_components_lookup1 = df.groupby("cas1").x1.first()
+cannonical_smiles_lookup2 = df.groupby("cas2").SMILES2.first()
+cannonical_components_lookup2 = df.groupby("cas2").x2.first()
+
+
+df["SMILES1"] = df.cas1.apply(lambda x: cannonical_smiles_lookup1[x])
+df["x1"] = df.cas1.apply(lambda x: cannonical_components_lookup1[x])
+df["SMILES2"] = df.cas2.apply(lambda x: cannonical_smiles_lookup2[x])
+df["x2"] = df.cas2.apply(lambda x: cannonical_components_lookup2[x])
+
+# Extract rows with temperature between 128 and 399 K
+df = df[df['Temperature, K'] > 250.]
+df = df[df['Temperature, K'] < 400.]
+
+# Extract rows with pressure between 101.325 kPa and 101325 kPa
+df = df[df['Pressure, kPa'] > 100.]
+df = df[df['Pressure, kPa'] < 102000.]
+
+df.dropna(axis=1, how='all', inplace=True)
+
+df["filename"] = df.filename.map(lambda x: x.replace(' ', '')[25:])
+df["filename"] = df.filename.map(lambda x: x.replace(' ', '')[:-4])
+
+def dfpretty(df, prop):
+    dfbig = pd.concat([df['filename'], df["x1"], df['x2'], df["SMILES1"], df["SMILES2"], df["cas1"], df["cas2"], df["InChI1"], df["InChI2"], df["components"], df["Mole fraction"],df["Temperature, K"], df["Pressure, kPa"], df[prop], df[prop+"_std"]], axis=1, keys=["filename", "x1", "x2", "SMILES1", "SMILES2", "cas1", "cas2", "InChI1", "InChI2", "components", "Mole fraction", "Temperature, K", "Pressure, kPa", prop, prop+"_std"])
+    dfbig[prop+"_std"].replace('nan', np.nan, inplace=True)
+    dfbig = dfbig[np.isnan(dfbig[prop+"_std"])==False]
+    cannonical_smiles_lookup1 = dfbig.groupby("cas1").SMILES1.first()
+    cannonical_components_lookup1 = dfbig.groupby("cas1").x1.first()
+    cannonical_smiles_lookup2 = dfbig.groupby("cas2").SMILES2.first()
+    cannonical_components_lookup2 = dfbig.groupby("cas2").x2.first()
+    dfbig["SMILES1"] = dfbig.cas1.apply(lambda x: cannonical_smiles_lookup1[x])
+    dfbig["x1"] = dfbig.cas1.apply(lambda x: cannonical_components_lookup1[x])
+    dfbig["SMILES2"] = dfbig.cas2.apply(lambda x: cannonical_smiles_lookup2[x])
+    dfbig["x2"] = dfbig.cas2.apply(lambda x: cannonical_components_lookup2[x])
+    a = dfbig["filename"].value_counts()
+    a = a.reset_index()
+    a.rename(columns={"index":"Filename","filename":"Count"},inplace=True)
+    bInChI = pd.concat([dfbig["InChI1"], dfbig["InChI2"]], axis=1, keys = ["InChI1", "InChI2"])
+    b = pd.Series(bInChI.squeeze().values.ravel()).value_counts()
+    b = b.reset_index()
+    b.rename(columns={"index":"InChI",0:"Count"},inplace=True)
+    b["Component"] = b.InChI.apply(lambda x: resolve_cached(x, "iupac_name"))
+    b["SMILES"] = b.InChI.apply(lambda x: resolve_cached(x, "smiles"))
+    c = dfbig["components"].value_counts()
+    c = c.reset_index()
+    c.rename(columns={"index":"Mixture", "components":"Count"}, inplace=True)
+    
+    return dfbig, a, b, c
+    
+    
+dfbig = pd.concat([df['filename'], df['x1'], df['x2'], df["SMILES1"], df["SMILES2"], df["cas1"], df["cas2"], df["InChI1"], df["InChI2"], df["components"], df["Mole fraction"], df["Temperature, K"], df["Pressure, kPa"], df["Mass density, kg/m3"], df["Mass density, kg/m3_std"], df["Excess molar enthalpy (molar enthalpy of mixing), kJ/mol"], df["Excess molar enthalpy (molar enthalpy of mixing), kJ/mol_std"], df["Excess molar heat capacity, J/K/mol"], df["Excess molar heat capacity, J/K/mol_std"], df["Excess molar volume, m3/mol"], df["Excess molar volume, m3/mol_std"], df["Activity coefficient"], df["Activity coefficient_std"], df["Speed of sound, m/s"], df["Speed of sound, m/s_std"], df["Relative permittivity at zero frequency"], df["Relative permittivity at zero frequency_std"]], axis=1, keys=["filename", "x1", "x2", "SMILES1", "SMILES2", "cas1", "cas2", "InChI1", "InChI2", "components", "Mole fraction", "Temperature, K", "Pressure, kPa", "Mass density, kg/m3", "Mass density, kg/m3_std", "Excess molar enthalpy (molar enthalpy of mixing), kJ/mol", "Excess molar enthalpy (molar enthalpy of mixing), kJ/mol_std", "Excess molar heat capacity, J/K/mol", "Excess molar heat capacity, J/K/mol_std", "Excess molar volume, m3/mol", "Excess molar volume, m3/mol_std", "Activity coefficient", "Activity coefficient_std", "Speed of sound, m/s", "Speed of sound, m/s_std", "Relative permittivity at zero frequency", "Relative permittivity at zero frequency_std"])
+cannonical_smiles_lookup1 = dfbig.groupby("cas1").SMILES1.first()
+cannonical_components_lookup1 = dfbig.groupby("cas1").x1.first()
+cannonical_smiles_lookup2 = dfbig.groupby("cas2").SMILES2.first()
+cannonical_components_lookup2 = dfbig.groupby("cas2").x2.first()
+dfbig["SMILES1"] = dfbig.cas1.apply(lambda x: cannonical_smiles_lookup1[x])
+dfbig["x1"] = dfbig.cas1.apply(lambda x: cannonical_components_lookup1[x])
+dfbig["SMILES2"] = dfbig.cas2.apply(lambda x: cannonical_smiles_lookup2[x])
+dfbig["x2"] = dfbig.cas2.apply(lambda x: cannonical_components_lookup2[x])
+a = dfbig["filename"].value_counts()
+a = a.reset_index()
+a.rename(columns={"index":"Filename","filename":"Count"},inplace=True)
+bInChI = pd.concat([dfbig["InChI1"], dfbig["InChI2"]], axis=1, keys = ["InChI1", "InChI2"])
+b = pd.Series(bInChI.squeeze().values.ravel()).value_counts()
+b = b.reset_index()
+b.rename(columns={"index":"InChI",0:"Count"},inplace=True)
+b["Component"] = b.InChI.apply(lambda x: resolve_cached(x, "iupac_name"))
+b["SMILES"] = b.InChI.apply(lambda x: resolve_cached(x, "smiles"))
+c = dfbig["components"].value_counts()
+c = c.reset_index()
+c.rename(columns={"index":"Mixture", "components":"Count"}, inplace=True)    
+
+df1, a1, b1, c1 = dfpretty(df, "Mass density, kg/m3")
+df2, a2, b2, c2 = dfpretty(df, "Excess molar enthalpy (molar enthalpy of mixing), kJ/mol")
+df3, a3, b3, c3 = dfpretty(df, "Excess molar heat capacity, J/K/mol")
+df4, a4, b4, c4 = dfpretty(df, "Excess molar volume, m3/mol")
+df5, a5, b5, c5 = dfpretty(df, "Activity coefficient")
+df6, a6, b6, c6 = dfpretty(df, "Speed of sound, m/s")
+df7, a7, b7, c7 = dfpretty(df, "Relative permittivity at zero frequency")
+
+
+pathdf = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Binary-Mixtures/Property data/"
+pathjourn = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Binary-Mixtures/Journal name counts/"
+pathcomp = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Binary-Mixtures/Component counts/"
+pathmix = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Binary-Mixtures/Mixture counts/"
+
+def saveprettycsv(df, path, filename):
+    df.to_csv(path+filename, sep =';')
+
+def saveprettypickle(df, path, filename):
+    df.to_pickle(path+filename)
+
+# save csv with ; delimiter
+saveprettycsv(dfbig, pathdf, "alldata_bin_full.csv")
+saveprettycsv(df1, pathdf, "dens_bin_full.csv")
+saveprettycsv(df2, pathdf, "eme_bin_full.csv")
+saveprettycsv(df3, pathdf, "emcp_bin_full.csv")
+saveprettycsv(df4, pathdf, "emv_bin_full.csv")
+saveprettycsv(df5, pathdf, "actcoeff_bin_full.csv")
+saveprettycsv(df6, pathdf, "sos_bin_full.csv")
+saveprettycsv(df7, pathdf, "dielec_bin_full.csv")
+
+saveprettycsv(a, pathjourn, "binname_counts_all_full.csv")
+saveprettycsv(a1, pathjourn, "binname_counts_dens_full.csv")
+saveprettycsv(a2, pathjourn, "binname_counts_eme_full.csv")
+saveprettycsv(a3, pathjourn, "binname_counts_emcp_full.csv")
+saveprettycsv(a4, pathjourn, "binname_counts_emv_full.csv")
+saveprettycsv(a5, pathjourn, "binname_counts_actcoeff_full.csv")
+saveprettycsv(a6, pathjourn, "binname_counts_sos_full.csv")
+saveprettycsv(a7, pathjourn, "binname_counts_dielec_full.csv")
+
+saveprettycsv(b, pathcomp, "bincomp_counts_all_full.csv")
+saveprettycsv(b1, pathcomp, "bincomp_counts_dens_full.csv")
+saveprettycsv(b2, pathcomp, "bincomp_counts_eme_full.csv")
+saveprettycsv(b3, pathcomp, "bincomp_counts_emcp_full.csv")
+saveprettycsv(b4, pathcomp, "bincomp_counts_emv_full.csv")
+saveprettycsv(b5, pathcomp, "bincomp_counts_actcoeff_full.csv")
+saveprettycsv(b6, pathcomp, "bincomp_counts_sos_full.csv")
+saveprettycsv(b7, pathcomp, "bincomp_counts_dielec_full.csv")
+
+saveprettycsv(c, pathmix, "mix_counts_all_full.csv")
+saveprettycsv(c1, pathmix, "mix_counts_dens_full.csv")
+saveprettycsv(c2, pathmix, "mix_counts_eme_full.csv")
+saveprettycsv(c3, pathmix, "mix_counts_emcp_full.csv")
+saveprettycsv(c4, pathmix, "mix_counts_emv_full.csv")
+saveprettycsv(c5, pathmix, "mix_counts_actcoeff_full.csv")
+saveprettycsv(c6, pathmix, "mix_counts_sos_full.csv")
+saveprettycsv(c7, pathmix, "mix_counts_dielec_full.csv")
+
+# save pickle
+saveprettypickle(dfbig, pathdf, "alldata_bin_full.pkl")
+saveprettypickle(df1, pathdf, "dens_bin_full.pkl")
+saveprettypickle(df2, pathdf, "eme_bin_full.pkl")
+saveprettypickle(df3, pathdf, "emcp_bin_full.pkl")
+saveprettypickle(df4, pathdf, "emv_bin_full.pkl")
+saveprettypickle(df5, pathdf, "actcoeff_bin_full.pkl")
+saveprettypickle(df6, pathdf, "sos_bin_full.pkl")
+saveprettypickle(df7, pathdf, "dielec_bin_full.pkl")
+
+saveprettypickle(a, pathjourn, "binname_counts_all_full.pkl")
+saveprettypickle(a1, pathjourn, "binname_counts_dens_full.pkl")
+saveprettypickle(a2, pathjourn, "binname_counts_eme_full.pkl")
+saveprettypickle(a3, pathjourn, "binname_counts_emcp_full.pkl")
+saveprettypickle(a4, pathjourn, "binname_counts_emv_full.pkl")
+saveprettypickle(a5, pathjourn, "binname_counts_actcoeff_full.pkl")
+saveprettypickle(a6, pathjourn, "binname_counts_sos_full.pkl")
+saveprettypickle(a7, pathjourn, "binname_counts_dielec_full.pkl")
+
+saveprettypickle(b, pathcomp, "bincomp_counts_all_full.pkl")
+saveprettypickle(b1, pathcomp, "bincomp_counts_dens_full.pkl")
+saveprettypickle(b2, pathcomp, "bincomp_counts_eme_full.pkl")
+saveprettypickle(b3, pathcomp, "bincomp_counts_emcp_full.pkl")
+saveprettypickle(b4, pathcomp, "bincomp_counts_emv_full.pkl")
+saveprettypickle(b5, pathcomp, "bincomp_counts_actcoeff_full.pkl")
+saveprettypickle(b6, pathcomp, "bincomp_counts_sos_full.pkl")
+saveprettypickle(b7, pathcomp, "bincomp_counts_dielec_full.pkl")
+
+saveprettypickle(c, pathmix, "mix_counts_all_full.pkl")
+saveprettypickle(c1, pathmix, "mix_counts_dens_full.pkl")
+saveprettypickle(c2, pathmix, "mix_counts_eme_full.pkl")
+saveprettypickle(c3, pathmix, "mix_counts_emcp_full.pkl")
+saveprettypickle(c4, pathmix, "mix_counts_emv_full.pkl")
+saveprettypickle(c5, pathmix, "mix_counts_actcoeff_full.pkl")
+saveprettypickle(c6, pathmix, "mix_counts_sos_full.pkl")
+saveprettypickle(c7, pathmix, "mix_counts_dielec_full.pkl")
+
+

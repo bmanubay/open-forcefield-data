@@ -1,0 +1,45 @@
+;Mixture;Count
+0;methylsulfinylmethane__water;363
+1;N-methylacetamide__N,N-dimethylacetamide;110
+2;ethanol__methanol;105
+3;methanol__2-propanol;105
+4;methanol__1-propanol;105
+5;methanol__1-butanol;105
+6;methanol__2-methyl-1-propanol;105
+7;methanol__2-methyl-2-propanol;95
+8;glycine__water;88
+9;N-methyldiethanolamine__tetramethylene sulfone;88
+10;nonane__2,5,8-trioxanonane;66
+11;n-octane__dimethoxytetraglycol;66
+12;pentan-1-ol__dimethoxytetraglycol;66
+13;1,2-dimethoxyethane__nonane;66
+14;diethyl carbonate__triglyme;55
+15;triglyme__dimethyl carbonate;55
+16;L-serine__water;48
+17;L-alanine__water;48
+18;L-proline__water;48
+19;pentan-1-ol__butyl oxide;45
+20;pentan-1-ol__n-octane;45
+21;n-octane__butyl oxide;45
+22;bis(2-hydroxyethyl) ether__ethanol, 2-propoxy-;39
+23;triethylene glycol__ethanol, 2-propoxy-;39
+24;tetraethylene glycol__ethanol, 2-propoxy-;39
+25;1-butanol__.gamma.-butyrolactone;36
+26;heptane__dimethoxytetraglycol;34
+27;triglyme__heptane;33
+28;2,5,8-trioxanonane__heptane;33
+29;dimethylglycol__heptane;31
+30;2-amino-2-methyl-1-propanol__water;24
+31;diethanolamine__water;24
+32;N-methyldiethanolamine__water;24
+33;diisopropanolamine__water;24
+34;triethanolamine__water;24
+35;glycerol__N,N-dimethylacetamide;16
+36;glycerol__2-aminoethanol;16
+37;glycerol__formamide;16
+38;glycerol__N,N-dimethylformamide;16
+39;glycerol__2-dimethylaminoethanol;16
+40;1,2-ethanediol__water;10
+41;1,3-propanediol__water;8
+42;1,2-propanediol__water;8
+43;glycerol__water;8

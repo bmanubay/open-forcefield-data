@@ -4,13 +4,18 @@ Created on Tue Aug 02 17:38:07 2016
 
 @author: Bryce Manubay
 """
+import matplotlib as mpl
+
+mpl.use('Agg')
 
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import pdb
+import sys
 
-purepath = "C:\\Users\\Bryce Manubay\\Desktop\\UCB\\Shirts Group\\open-forcefield-data-master\\Pure-Solvents\\Component counts\\"
-mixdpath = "C:\\Users\\Bryce Manubay\\Desktop\\UCB\\Shirts Group\\open-forcefield-data-master\\Binary-Mixtures\\Component counts\\"
+purepath = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Pure-Solvents/Component counts/"
+mixdpath = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Binary-Mixtures/Component counts/"
 
 a0 = pd.read_csv(purepath+"purecomp_counts_all.csv", sep=";", usecols=["Count", "SMILES"])
 a0 = a0.rename(columns={"Count":"PureAll"})
@@ -158,6 +163,39 @@ bincountemcAlk = len(bb5.SMILES)
 bincountemvAlk = len(bb6.SMILES)
 bincountactAlk = len(bb7.SMILES)
 
+# measure atom type diversity in AlkEthOH filter set 
+aa0alkane = aa0[aa0.SMILES.str.contains('O') == False]
+bb0alkane = bb0[bb0.SMILES.str.contains('O') == False]
+
+aa0alco = aa0[aa0.SMILES.str.contains('CO') == True]
+aa0alco['if_o'] = aa0.SMILES.str[-1:]
+aa0alco = aa0alco[aa0alco.if_o.str.contains('O') == True]
+aa0alco = aa0alco.drop('if_o', 1)
+bb0alco = bb0[bb0.SMILES.str.contains('CO') == True]
+bb0alco['if_o'] = bb0.SMILES.str[-1:]
+bb0alco = bb0alco[bb0alco.if_o.str.contains('O') == True]
+bb0alco = bb0alco.drop('if_o', 1)
+
+aa0ether = aa0[(aa0.SMILES.str.contains('COC') == True) | (aa0.SMILES.str.contains('(C)OC') == True) | (aa0.SMILES.str.contains('CO(C)') == True)] 
+bb0ether = bb0[(bb0.SMILES.str.contains('COC') == True) | (bb0.SMILES.str.contains('(C)OC') == True) | (bb0.SMILES.str.contains('CO(C)') == True)] 
+
+puralkpts = aa0alkane.PureAllAlk.sum()
+puralcpts = aa0alco.PureAllAlk.sum()
+purethpts = aa0ether.PureAllAlk.sum()
+
+binalkpts = bb0alkane.BinAllAlk.sum()
+binalcpts = bb0alco.BinAllAlk.sum()
+binethpts = bb0ether.BinAllAlk.sum()
+
+puralktyp = aa0alkane.PureAllAlk.count()
+puralctyp = aa0alco.PureAllAlk.count()
+purethtyp = aa0ether.PureAllAlk.count()
+
+binalktyp = bb0alkane.BinAllAlk.count()
+binalctyp = bb0alco.BinAllAlk.count()
+binethtyp = bb0ether.BinAllAlk.count()
+
+
 def autolabel(rects, ax):
     # Get y-axis height to calculate label position from.
     (y_bottom, y_top) = ax.get_ylim()
@@ -203,7 +241,7 @@ ax.set_xticklabels(('Pure All', 'Pure Density', 'Pure Speed of Sound', 'Pure Die
 
 ax.legend((rects1[0], rects2[0]), ('All data', 'AlkEthOH set'))
 
-plt.show()
+plt.savefig('Molecules_per_property.png')
 
 SpreadDat = [len11,len22,len33,len44,len55,len56,len57]
 SpreadDatAlk = [len11Alk,len22Alk,len33Alk,len44Alk,len55Alk,len56Alk,len57Alk]
@@ -227,4 +265,44 @@ ax.set_xticklabels(('>=1 Pure and >=1 Binary', '>=2 Pure and >=2 Binary', '>=3 P
 
 ax.legend((rects1[0], rects2[0]), ('All data', 'AlkEthOH set'))
 
-plt.show()
+plt.savefig('Coupled_property_coverage.png')
+
+CountDat = [puralkpts,puralcpts,purethpts,binalkpts,binalcpts,binethpts]
+TypeDat = [puralktyp,puralctyp,purethtyp,binalktyp,binalctyp,binethtyp]
+
+N = 6
+ind = np.arange(N)
+width = 0.2
+
+fig, ax = plt.subplots()
+
+rects1 = ax.bar(ind,CountDat,width,color='r')
+
+autolabel(rects1,ax)
+
+ax.set_ylabel('Data Point Count')
+ax.set_title('Data point count per chemical environment in AlkEthOH filtered data')
+ax.set_xticks(ind+width)
+ax.set_xticklabels(('Alkanes Pure','Alcohols Pure','Ethers Pure','Alkanes Binary','Alcohols Binary','Ethers Binary'), rotation=90)
+
+plt.savefig('data_per_chemistry.png')
+
+N = 6
+ind = np.arange(N)
+width = 0.2
+
+fig, ax = plt.subplots()
+
+rects1 = ax.bar(ind,TypeDat,width,color='r')
+
+autolabel(rects1,ax)
+
+ax.set_ylabel('Molecule Count')
+ax.set_title('Molecules per chemical environment in AlkEthOH filtered data')
+ax.set_xticks(ind+width)
+ax.set_xticklabels(('Alkanes Pure','Alcohols Pure','Ethers Pure','Alkanes Binary','Alcohols Binary','Ethers Binary'), rotation=90)
+
+plt.savefig('types_per_chemistry.png')
+
+
+

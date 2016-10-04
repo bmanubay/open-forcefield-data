@@ -10,6 +10,7 @@ import cirpy
 import numpy as np
 import pandas as pd
 from sklearn.externals.joblib import Memory
+import sys
 
 mem = Memory(cachedir="/home/bmanubay/.thermoml/")
 
@@ -24,6 +25,9 @@ S["SMILES"] = S.IUPAC_Names.apply(lambda x: resolve_cached(x, "smiles"))
 
 df = th.pandas_dataframe()
 dt = list(df.columns)
+for i in dt:
+    print i
+sys.exit()
 
 bad_filenames = ["/home/bmanubay/.thermoml/j.fluid.2013.12.014.xml"]  # This file confirmed to have possible data entry errors.
 df = df[~df.filename.isin(bad_filenames)]

@@ -227,15 +227,16 @@ ind = np.arange(N)  # the x locations for the groups
 width = 0.2      # the width of the bars
 
 fig, ax = plt.subplots()
-rects1 = ax.bar(ind, MolDat, width, color='r')
+rects1 = ax.bar(ind, MolDat, width, color='r', align='center')
 
-rects2 = ax.bar(ind + width, MolDatAlk, width, color='y')
+rects2 = ax.bar(ind + width, MolDatAlk, width, color='y', align='center')
 
 autolabel(rects1, ax)
 autolabel(rects2, ax)
 
 ax.set_ylabel('Molecule Count')
-ax.set_title('Unique Molecules per Property of Interest')
+ttl = ax.set_title('Unique Molecules per Property of Interest')
+ttl.set_position([.5, 1.05])
 ax.set_xticks(ind + width)
 xlabel = ax.set_xticklabels(('Pure All', 'Pure Density', 'Pure Speed of Sound', 'Pure Dielectric Constant', 'Pure Heat Capacity', 'Pure Enthalpy of Vaporization', 'Binary All', 'Binary Density', 'Binary Speed of Sound', 'Binary Dielectric Constant', 'Binary Excess Molar Enthalpy', 'Binary Excess Molar Heat Capacity', 'Binary Excess Molar Volume', 'Binary Activity Coefficient'), rotation=90)
 
@@ -251,15 +252,16 @@ ind = np.arange(N)  # the x locations for the groups
 width = 0.2      # the width of the bars
 
 fig, ax = plt.subplots()
-rects1 = ax.bar(ind, SpreadDat, width, color='r')
+rects1 = ax.bar(ind, SpreadDat, width, color='r', align='center')
 
-rects2 = ax.bar(ind + width, SpreadDatAlk, width, color='y')
+rects2 = ax.bar(ind + width, SpreadDatAlk, width, color='y', align='center')
 
 autolabel(rects1, ax)
 autolabel(rects2, ax)
 
 ax.set_ylabel('Molecule Count')
-ax.set_title('Coupled Pure and Binary Property Coverage')
+ttl = ax.set_title('Coupled Pure and Binary Property Coverage')
+ttl.set_position([.5, 1.05])
 ax.set_xticks(ind + width)
 xlabel = ax.set_xticklabels(('>=1 Pure and >=1 Binary', '>=2 Pure and >=2 Binary', '>=3 Pure and >=3 Binary', '>=4 Pure and >=4 Binary', '>=5 Pure and >=5 Binary', '>=5 Pure and >=6 Binary', '>=5 Pure and >=7 Binary'), rotation=90)
 
@@ -276,12 +278,13 @@ width = 0.2
 
 fig, ax = plt.subplots()
 
-rects1 = ax.bar(ind,CountDat,width,color='r')
+rects1 = ax.bar(ind,CountDat,width,color='r',align='center')
 
 autolabel(rects1,ax)
 
 ax.set_ylabel('Data Point Count')
-ax.set_title('Data point count per chemical environment in AlkEthOH filtered data')
+ttl = ax.set_title('Data point count per chemical environment in AlkEthOH filtered data')
+ttl.set_position([.5, 1.05])
 ax.set_xticks(ind+width)
 xlabel = ax.set_xticklabels(('Alkanes Pure','Alcohols Pure','Ethers Pure','Alkanes Binary','Alcohols Binary','Ethers Binary'), rotation=90)
 
@@ -293,12 +296,13 @@ width = 0.2
 
 fig, ax = plt.subplots()
 
-rects1 = ax.bar(ind,TypeDat,width,color='r')
+rects1 = ax.bar(ind,TypeDat,width,color='r',align='center')
 
 autolabel(rects1,ax)
 
 ax.set_ylabel('Molecule Count')
-ax.set_title('Molecules per chemical environment in AlkEthOH filtered data')
+ttl = ax.set_title('Molecules per chemical environment in AlkEthOH filtered data')
+ttl.set_position([.5, 1.05])
 ax.set_xticks(ind+width)
 xlabel = ax.set_xticklabels(('Alkanes Pure','Alcohols Pure','Ethers Pure','Alkanes Binary','Alcohols Binary','Ethers Binary'), rotation=90)
 

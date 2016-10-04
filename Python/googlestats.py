@@ -237,11 +237,11 @@ autolabel(rects2, ax)
 ax.set_ylabel('Molecule Count')
 ax.set_title('Unique Molecules per Property of Interest')
 ax.set_xticks(ind + width)
-ax.set_xticklabels(('Pure All', 'Pure Density', 'Pure Speed of Sound', 'Pure Dielectric Constant', 'Pure Heat Capacity', 'Pure Enthalpy of Vaporization', 'Binary All', 'Binary Density', 'Binary Speed of Sound', 'Binary Dielectric Constant', 'Binary Excess Molar Enthalpy', 'Binary Excess Molar Heat Capacity', 'Binary Excess Molar Volume', 'Binary Activity Coefficient'), rotation=90)
+xlabel = ax.set_xticklabels(('Pure All', 'Pure Density', 'Pure Speed of Sound', 'Pure Dielectric Constant', 'Pure Heat Capacity', 'Pure Enthalpy of Vaporization', 'Binary All', 'Binary Density', 'Binary Speed of Sound', 'Binary Dielectric Constant', 'Binary Excess Molar Enthalpy', 'Binary Excess Molar Heat Capacity', 'Binary Excess Molar Volume', 'Binary Activity Coefficient'), rotation=90)
 
 ax.legend((rects1[0], rects2[0]), ('All data', 'AlkEthOH set'))
 
-plt.savefig('Molecules_per_property.png')
+plt.savefig('Molecules_per_property.png', bbox_inches='tight')
 
 SpreadDat = [len11,len22,len33,len44,len55,len56,len57]
 SpreadDatAlk = [len11Alk,len22Alk,len33Alk,len44Alk,len55Alk,len56Alk,len57Alk]
@@ -261,11 +261,11 @@ autolabel(rects2, ax)
 ax.set_ylabel('Molecule Count')
 ax.set_title('Coupled Pure and Binary Property Coverage')
 ax.set_xticks(ind + width)
-ax.set_xticklabels(('>=1 Pure and >=1 Binary', '>=2 Pure and >=2 Binary', '>=3 Pure and >=3 Binary', '>=4 Pure and >=4 Binary', '>=5 Pure and >=5 Binary', '>=5 Pure and >=6 Binary', '>=5 Pure and >=7 Binary'), rotation=90)
+xlabel = ax.set_xticklabels(('>=1 Pure and >=1 Binary', '>=2 Pure and >=2 Binary', '>=3 Pure and >=3 Binary', '>=4 Pure and >=4 Binary', '>=5 Pure and >=5 Binary', '>=5 Pure and >=6 Binary', '>=5 Pure and >=7 Binary'), rotation=90)
 
 ax.legend((rects1[0], rects2[0]), ('All data', 'AlkEthOH set'))
 
-plt.savefig('Coupled_property_coverage.png')
+plt.savefig('Coupled_property_coverage.png', bbox_inches='tight')
 
 CountDat = [puralkpts,puralcpts,purethpts,binalkpts,binalcpts,binethpts]
 TypeDat = [puralktyp,puralctyp,purethtyp,binalktyp,binalctyp,binethtyp]
@@ -283,9 +283,9 @@ autolabel(rects1,ax)
 ax.set_ylabel('Data Point Count')
 ax.set_title('Data point count per chemical environment in AlkEthOH filtered data')
 ax.set_xticks(ind+width)
-ax.set_xticklabels(('Alkanes Pure','Alcohols Pure','Ethers Pure','Alkanes Binary','Alcohols Binary','Ethers Binary'), rotation=90)
+xlabel = ax.set_xticklabels(('Alkanes Pure','Alcohols Pure','Ethers Pure','Alkanes Binary','Alcohols Binary','Ethers Binary'), rotation=90)
 
-plt.savefig('data_per_chemistry.png')
+plt.savefig('data_per_chemistry.png', bbox_inches='tight')
 
 N = 6
 ind = np.arange(N)
@@ -300,9 +300,7 @@ autolabel(rects1,ax)
 ax.set_ylabel('Molecule Count')
 ax.set_title('Molecules per chemical environment in AlkEthOH filtered data')
 ax.set_xticks(ind+width)
-ax.set_xticklabels(('Alkanes Pure','Alcohols Pure','Ethers Pure','Alkanes Binary','Alcohols Binary','Ethers Binary'), rotation=90)
+xlabel = ax.set_xticklabels(('Alkanes Pure','Alcohols Pure','Ethers Pure','Alkanes Binary','Alcohols Binary','Ethers Binary'), rotation=90)
 
-plt.savefig('types_per_chemistry.png')
-
-
+plt.savefig('types_per_chemistry.png', bbox_inches='tight')
 

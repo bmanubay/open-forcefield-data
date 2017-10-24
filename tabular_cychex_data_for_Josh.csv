@@ -1,0 +1,3 @@
+;Molar volume, m3/mol;Molar volume, m3/mol_std;Molar heat capacity at constant pressure, J/K/mol;Molar heat capacity at constant pressure, J/K/mol_std;Temperature, K;Pressure, kPa;components;filename;phase
+1292330;;;153.75;0.46125;293.15;101.325;cyclohexane;/home/brma3379/.thermoml/je401098b.xml;Liquid
+1768217;0.00010764;1e-07;;;293.15;101.325;cyclohexane;/home/brma3379/.thermoml/j.jct.2010.01.016.xml;Liquid

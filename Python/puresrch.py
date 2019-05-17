@@ -14,6 +14,7 @@ import sys
 
 mem = Memory(cachedir="/home/bmanubay/.thermoml/")
 
+# cacheing the SMILES string resolutions because this lookup (rather than generation) is MUCH faster. Only need to do the slow gen step ONCE per compound.
 @mem.cache
 def resolve_cached(x, rtype):
    return cirpy.resolve(x, rtype)
@@ -21,56 +22,62 @@ def resolve_cached(x, rtype):
 # Compounds of most interest as decide by David, Chris and Bryce   
 davmollist = ['2,2,4-trimethylpentane', 'cycloheptane', 'diisopropylether', 'isopropyl ether', 'dimethoxymethane', '2,3-dimethylbutane', '2,2-dimethylbutane', '3-methylpentane', 'neohexane', '4-methyl-2-pentanol', '2-methyl-2-pentanol', '1,1-diethoxyethane', 'tert-butanol', 'tetrahydrofuran', 'heptane', 'water', 'ethanol', '1-butanol', 'methyl tert-butyl ether']
 S = pd.DataFrame({'IUPAC_Names': davmollist}, columns = ['IUPAC_Names'])
-S["SMILES"] = S.IUPAC_Names.apply(lambda x: resolve_cached(x, "smiles"))
+S["SMILES"] = S.IUPAC_Names.apply(lambda x: resolve_cached(x, "smiles")) # our interesting compounds in SMILES as a df column
 
-df = th.pandas_dataframe()
+
+df = th.pandas_dataframe() # pull all ThermoML data into Pandas df (as it is in your local cache)
 dt = list(df.columns)
-for i in dt:
-    print i
-sys.exit()
 
 bad_filenames = ["/home/bmanubay/.thermoml/j.fluid.2013.12.014.xml"]  # This file confirmed to have possible data entry errors.
 df = df[~df.filename.isin(bad_filenames)]
 
-experiments = ["Mass density, kg/m3","Speed of sound, m/s", "Relative permittivity at zero frequency", "Molar heat capacity at constant pressure, J/K/mol", "Molar enthalpy of vaporization or sublimation, kJ/mol", "Molar enthalpy, kJ/mol"]
+# Define properties of interest
+experiments = ["Mass density, kg/m3","Speed of sound, m/s", "Relative permittivity at zero frequency", "Molar heat capacity at constant pressure, J/K/mol", "Molar enthalpy of vaporization or sublimation, kJ/mol", "Molar enthalpy, kJ/mol"] 
 
+# Drop rows that don't have any data for your properties of interest
 ind_list = [df[exp].dropna().index for exp in experiments]
 ind = reduce(lambda x,y: x.union(y), ind_list)
 df = df.ix[ind]
 
+# Matches of iupac names to chemical formulas (I think this is native or I got it from Kyle Beauchamp, can also be easily generated with OpenEye I'm sure)
 name_to_formula = pd.read_hdf("/home/bmanubay/.thermoml/compound_name_to_formula.h5", 'data')
 name_to_formula = name_to_formula.dropna()   
 
 
-# Extract rows with two components
-df["n_components"] = df.components.apply(lambda x: len(x.split("__")))
+# Keep data that just has a single component
+df["n_components"] = df.components.apply(lambda x: len(x.split("__"))) # multiple component mixtures are identified by component name strings joined by "_"'s
 df = df[df.n_components == 1]
 df.dropna(axis=1, how='all', inplace=True)
 
 # Strip rows not in liquid phase
 df = df[df['phase']=='Liquid']
 
+# Create formula column using `name_to_formula` object
 df = df[df.components.isin(name_to_formula.index)]
 name_to_formula = name_to_formula[name_to_formula.index.isin(df.components)]
 df["formula"] = df.components.apply(lambda chemical: name_to_formula[chemical])
 
-heavy_atoms = ["C", "O"]
+# Define the atoms that will be in the compounds you search for (could obviously be expanded)
+heavy_atoms = ["C", "O"] # maybe also include nitrogen, fluorine, boron, iodine, etc at some point. Doing search on formula names, so no need for case-sensitivity.
 desired_atoms = ["H"] + heavy_atoms
 
+# Get counts of atoms in each compound
 df["n_atoms"] = df.formula.apply(lambda formula_string : thermoml_lib.count_atoms(formula_string))
 df["n_heavy_atoms"] = df.formula.apply(lambda formula_string : thermoml_lib.count_atoms_in_set(formula_string, heavy_atoms))
 df["n_desired_atoms"] = df.formula.apply(lambda formula_string : thermoml_lib.count_atoms_in_set(formula_string, desired_atoms))
-df["n_other_atoms"] = df.n_atoms - df.n_desired_atoms
+df["n_other_atoms"] = df.n_atoms - df.n_desired_atoms # how many undesired atoms are in each row?
 
-df = df[df.n_other_atoms == 0]
+df = df[df.n_other_atoms == 0] # get rid of rows with other atoms other than those desired 
 
+# Define the desired size range of compounds by the number of heavy atoms they contain
 df = df[df.n_heavy_atoms > 0]
 df = df[df.n_heavy_atoms <= 40]
 df.dropna(axis=1, how='all', inplace=True)
 
+# Take the compound names and convert to SMILES for more refined filtering (I used cirpy, this can also be done with OpenEye)
 df["SMILES"] = df.components.apply(lambda x: resolve_cached(x, "smiles"))  # This should be cached via sklearn.
 df = df[df.SMILES != None]
-df = df[df["SMILES"].str.contains('=O') == False] # Getting rid of data sets with C=O and C=C occurrences
+df = df[df["SMILES"].str.contains('=O') == False] # Getting rid of data sets with C=O and C=C occurrences (and triple bonding; I think that's what `#` is in SMILES)
 df = df[df["SMILES"].str.contains('#') == False]
 df = df[df["SMILES"].str.contains('O=') == False]
 df = df[df["SMILES"].str.contains('=C') == False]
@@ -78,6 +85,7 @@ df = df[df["SMILES"].str.contains('C=') == False]
 df.dropna(subset=["SMILES"], inplace=True)
 df = df.ix[df.SMILES.dropna().index]
 
+# Create CAS and InChI identifiers as well
 df["cas"] = df.components.apply(lambda x: thermoml_lib.get_first_entry(resolve_cached(x, "cas")))  # This should be cached via sklearn.
 df["InChI"] = df.components.apply(lambda x: thermoml_lib.get_first_entry(resolve_cached(x, "stdinchikey")))
 df = df[df.cas != None]
@@ -87,32 +95,35 @@ df = df.ix[df.cas.dropna().index]
 cannonical_smiles_lookup = df.groupby("cas").SMILES.first()
 cannonical_components_lookup = df.groupby("cas").components.first()
 
-
 df["SMILES"] = df.cas.apply(lambda x: cannonical_smiles_lookup[x])
 df["components"] = df.cas.apply(lambda x: cannonical_components_lookup[x])
 
-# Extract rows with temperature between 128 and 399 K
+
+# Extract rows with temperature between 250 and 400 K
 df = df[df['Temperature, K'] > 250.]
 df = df[df['Temperature, K'] < 400.]
 
+# Not sure what this is exactly. This was before we were sure we would train to H_Vap data, so I think I seperated it.
 cols = ['filename', 'components', 'SMILES', 'cas', 'InChI', 'Temperature, K', 'Pressure, kPa', 'Molar enthalpy of vaporization or sublimation, kJ/mol', 'Molar enthalpy of vaporization or sublimation, kJ/mol_std']
 
 dfhvap = df[cols]
 dfhvap['Molar enthalpy of vaporization or sublimation, kJ/mol'].replace('nan', np.nan, inplace=True)
 dfhvap = dfhvap[np.isnan(dfhvap['Molar enthalpy of vaporization or sublimation, kJ/mol'])==False]
 
-# Extract rows with pressure between 101.325 kPa and 101325 kPa
+# Extract rows with pressure between 100 kPa and 101325 kPa
 df = df[df['Pressure, kPa'] > 100.]
-df = df[df['Pressure, kPa'] < 102000.]
+df = df[df['Pressure, kPa'] < 101325.]
 
 df.dropna(axis=1, how='all', inplace=True)
 
+# I think this is just extracting the DOI, so it looks nice
 df["filename"] = df["filename"].map(lambda x: x.replace(' ', '')[25:])
 df["filename"] = df.filename.map(lambda x: x.replace(' ', '')[:-4])
 
 dfhvap["filename"] = dfhvap["filename"].map(lambda x: x.replace(' ', '')[25:])
 dfhvap["filename"] = dfhvap.filename.map(lambda x: x.replace(' ', '')[:-4])
 
+# Make the df saved into as pretty and concise of a format as you want (and get rid of any fluff columns). This is going to give you data frames with a single property.
 def dfpretty(df, prop):
     dfbig = pd.concat([df['filename'], df["components"], df["SMILES"], df["cas"], df["InChI"], df["Temperature, K"], df["Pressure, kPa"], df[prop], df[prop+"_std"]], axis=1, keys=["filename", "components", "SMILES", "CAS", "InChI", "Temperature, K", "Pressure, kPa", prop, prop+"_std"])
     dfbig[prop+"_std"].replace('nan', np.nan, inplace=True)
@@ -123,16 +134,16 @@ def dfpretty(df, prop):
     dfbig["components"] = dfbig.CAS.apply(lambda x: cannonical_components_lookup[x])
     a = dfbig["filename"].value_counts()
     a = a.reset_index()
-    a.rename(columns={"index":"Filename","filename":"Count"},inplace=True)
+    a.rename(columns={"index":"Filename","filename":"Count"},inplace=True) # no. of unique journals
     b = dfbig["InChI"].value_counts()
     b = b.reset_index()
-    b.rename(columns={"index":"InChI","InChI":"Count"},inplace=True)
+    b.rename(columns={"index":"InChI","InChI":"Count"},inplace=True) # no. of unique compounds
     b["Component"] = b.InChI.apply(lambda x: resolve_cached(x, "iupac_name")) 
     b["SMILES"] = b.InChI.apply(lambda x: resolve_cached(x, "smiles")) 
     
     return dfbig, a, b
     
-                   
+# organize a data with all of the properties together                   
 dfbig = pd.concat([df['filename'], df["components"], df["SMILES"], df["cas"], df["InChI"], df["Temperature, K"], df["Pressure, kPa"], df["Mass density, kg/m3"], df["Mass density, kg/m3_std"], df["Speed of sound, m/s"], df["Speed of sound, m/s_std"], df["Relative permittivity at zero frequency"], df["Relative permittivity at zero frequency_std"], df["Molar heat capacity at constant pressure, J/K/mol"], df["Molar heat capacity at constant pressure, J/K/mol_std"], df["Molar enthalpy, kJ/mol"], df["Molar enthalpy, kJ/mol_std"]] , axis=1, keys=["filename", "components", "SMILES", "CAS", "InChI", "Temperature, K", "Pressure, kPa", "Mass density, kg/m3", "Mass density, kg/m3_std", "Speed of sound, m/s", "Speed of sound, m/s_std", "Relative permittivity at zero frequency", "Relative permittivity at zero frequency_std", "Molar heat capacity at constant pressure, J/K/mol", "Molar heat capacity at constant pressure, J/K/mol_std", "Molar enthalpy, kJ/mol", "Molar enthalpy, kJ/mol_std"])
 a = dfbig["filename"].value_counts()
 a = a.reset_index()
@@ -143,6 +154,7 @@ b.rename(columns={"index":"InChI","InChI":"Count"},inplace=True)
 b["Component"] = b.InChI.apply(lambda x: resolve_cached(x, "iupac_name"))     
 b["SMILES"] = b.InChI.apply(lambda x: resolve_cached(x, "smiles"))
 
+# Still not sure why I did this manually for H_vap (?)
 df6 = dfhvap
 a6 = df6["filename"].value_counts()
 a6 = a6.reset_index()
@@ -153,19 +165,19 @@ b6.rename(columns={"index":"InChI","InChI":"Count"},inplace=True)
 b6["Component"] = b6.InChI.apply(lambda x: resolve_cached(x, "iupac_name"))     
 b6["SMILES"] = b6.InChI.apply(lambda x: resolve_cached(x, "smiles"))
 
-
+# Neat liquid properties each in their own df
 df1, a1, b1 = dfpretty(df, "Mass density, kg/m3")
 df2, a2, b2 = dfpretty(df, "Speed of sound, m/s")
 df3, a3, b3 = dfpretty(df, "Relative permittivity at zero frequency")
 df4, a4, b4 = dfpretty(df, "Molar heat capacity at constant pressure, J/K/mol")
 df5, a5, b5 = dfpretty(df, "Molar enthalpy, kJ/mol")
 
-
-
+# Paths that I saved stuff to (obviously change as needed or autogen)
 pathdf = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Pure-Solvents/Property data/"
 pathjourn = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Pure-Solvents/Journal name counts/"
 pathcomp = "/home/bmanubay/.thermoml/tables/Ken/open-forcefield-data/Pure-Solvents/Component counts/"
 
+# Save csv and pickle copies
 def saveprettycsv(df, path, filename):
     df.to_csv(path+filename, sep =';')
 
@@ -173,7 +185,7 @@ def saveprettypickle(df, path, filename):
     df.to_pickle(path+filename)
 
 # save csv with ; delimiter
-saveprettycsv(dfbig, pathdf, "alldata_pure.csv")    
+saveprettycsv(dfbig, pathdf, "alldata_pure.csv") # the actual thermo data
 saveprettycsv(df1, pathdf, "dens_pure.csv") 
 saveprettycsv(df2, pathdf, "sos_pure.csv") 
 saveprettycsv(df3, pathdf, "dielec_pure.csv") 
@@ -181,7 +193,7 @@ saveprettycsv(df4, pathdf, "cpmol_pure.csv")
 saveprettycsv(df5, pathdf, "hmol_pure.csv") 
 saveprettycsv(df6, pathdf, "hvap_pure.csv")
 
-saveprettycsv(a, pathjourn, "purename_counts_all.csv")
+saveprettycsv(a, pathjourn, "purename_counts_all.csv") # no. of unique journals
 saveprettycsv(a1, pathjourn, "purename_counts_dens.csv")
 saveprettycsv(a2, pathjourn, "purename_counts_sos.csv")
 saveprettycsv(a3, pathjourn, "purename_counts_dielec.csv")
@@ -189,7 +201,7 @@ saveprettycsv(a4, pathjourn, "purename_counts_cpmol.csv")
 saveprettycsv(a5, pathjourn, "purename_counts_hmol.csv")
 saveprettycsv(a6, pathjourn, "purename_counts_hvap.csv")
 
-saveprettycsv(b, pathcomp, "purecomp_counts_all.csv")
+saveprettycsv(b, pathcomp, "purecomp_counts_all.csv") # no. of unique compounds
 saveprettycsv(b1, pathcomp, "purecomp_counts_dens.csv")
 saveprettycsv(b2, pathcomp, "purecomp_counts_sos.csv")
 saveprettycsv(b3, pathcomp, "purecomp_counts_dielec.csv")
@@ -198,7 +210,7 @@ saveprettycsv(b5, pathcomp, "purecomp_counts_hmol.csv")
 saveprettycsv(b6, pathcomp, "purecomp_counts_hvap.csv")
 
 # save pickle
-saveprettypickle(dfbig, pathdf, "alldata_pure.pkl")    
+saveprettypickle(dfbig, pathdf, "alldata_pure.pkl") # the actual thermo data   
 saveprettypickle(df1, pathdf, "dens_pure.pkl") 
 saveprettypickle(df2, pathdf, "sos_pure.pkl") 
 saveprettypickle(df3, pathdf, "dielec_pure.pkl") 
@@ -206,7 +218,7 @@ saveprettypickle(df4, pathdf, "cpmol_pure.pkl")
 saveprettypickle(df5, pathdf, "hmol_pure.pkl") 
 saveprettypickle(df6, pathdf, "hvap_pure.pkl")
 
-saveprettypickle(a, pathjourn, "purename_counts_all.pkl")
+saveprettypickle(a, pathjourn, "purename_counts_all.pkl") # no. of unique journals
 saveprettypickle(a1, pathjourn, "purename_counts_dens.pkl")
 saveprettypickle(a2, pathjourn, "purename_counts_sos.pkl")
 saveprettypickle(a3, pathjourn, "purename_counts_dielec.pkl")
@@ -214,7 +226,7 @@ saveprettypickle(a4, pathjourn, "purename_counts_cpmol.pkl")
 saveprettypickle(a5, pathjourn, "purename_counts_hmol.pkl")
 saveprettypickle(a6, pathjourn, "purename_counts_hvap.pkl")
 
-saveprettypickle(b, pathcomp, "purecomp_counts_all.pkl")
+saveprettypickle(b, pathcomp, "purecomp_counts_all.pkl") # no. of unique compounds
 saveprettypickle(b1, pathcomp, "purecomp_counts_dens.pkl")
 saveprettypickle(b2, pathcomp, "purecomp_counts_sos.pkl")
 saveprettypickle(b3, pathcomp, "purecomp_counts_dielec.pkl")
@@ -222,6 +234,8 @@ saveprettypickle(b4, pathcomp, "purecomp_counts_cpmol.pkl")
 saveprettypickle(b5, pathcomp, "purecomp_counts_hmol.pkl") 
 saveprettypickle(b6, pathcomp, "purecomp_counts_hvap.pkl")
 
+
+# The rest is just further narrowing based on the compound list in line 23
 
 def SMILESchk(df, SMILES):
     ind = df.SMILES.isin(SMILES)
@@ -245,7 +259,6 @@ b6D = b6D.reset_index()
 b6D.rename(columns={"index":"InChI","InChI":"Count"},inplace=True)    
 b6D["Component"] = b6D.InChI.apply(lambda x: resolve_cached(x, "iupac_name"))     
 b6D["SMILES"] = b6D.InChI.apply(lambda x: resolve_cached(x, "smiles"))
-
 
 
 # save csv with ; delimiter  
